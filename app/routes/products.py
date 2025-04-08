@@ -10,8 +10,6 @@ from fastapi.responses import JSONResponse
 import random
 import os
 from pathlib import Path
-from PIL import Image
-from io import BytesIO
 
 router = APIRouter(prefix="/productos", tags=["Products"])
 
@@ -23,14 +21,6 @@ categories_collection = db_client.categories
 IMAGE_FOLDER = Path("products_image")
 IMAGE_FOLDER.mkdir(exist_ok=True)  # Create the folder if it doesn't exist
 
-def resize_image(image_bytes: bytes, target_size=(1121, 700)) -> bytes:
-    image = Image.open(BytesIO(image_bytes))
-    image = image.convert("RGB")  # Convertir a RGB si es necesario
-    image = image.resize(target_size, Image.ANTIALIAS)  # Redimensionar con suavizado
-    output = BytesIO()
-    image.save(output, format="JPEG", quality=85)  # Guardar con compresión
-    return output.getvalue()
-
 # Obtener producto por ID
 def get_product_by_id(product_id: str):
     product = products_collection.find_one({"_id": ObjectId(product_id)})
@@ -41,6 +31,15 @@ def get_product_by_id(product_id: str):
     return product
 
 
+@router.get("/obtener_por_id/{product_id}")
+async def get_product(product_id: str):
+    product = get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    return JSONResponse(content=product)
+
+
+# Agregar productos
 @router.post("/agregar", response_model=Product)
 async def create_product(
     name: str = Form(...),
@@ -52,27 +51,29 @@ async def create_product(
     image: UploadFile = File(...),
     admin: User = Depends(admin_only)
 ):
+    # Debugging: Log incoming data
+    print("Product Data:", name, type, size, description, stock, category_name)
+    print("Image Filename:", image.filename)
+
     try:
+        # Normalize input
         name = name.strip().title()
         type = type.strip().title()
         category_name = category_name.strip().title()
         size_list = [s.strip().title() for s in size.split(",") if s.strip()]
 
-        # Leer imagen y redimensionarla
-        image_bytes = await image.read()
-        resized_image_bytes = resize_image(image_bytes)
-
-        # Guardar imagen redimensionada
+        # Save the image to the products_image folder
         image_filename = f"{name.replace(' ', '_')}.jpg"
         image_path = IMAGE_FOLDER / image_filename
         with open(image_path, "wb") as f:
-            f.write(resized_image_bytes)
+            f.write(await image.read())
 
-        # Verificar si la categoría existe
+        # Check if the category exists
         category = categories_collection.find_one({"name": category_name})
         if not category:
             raise HTTPException(status_code=404, detail=f"La categoría '{category_name}' no existe.")
 
+        # Prepare the product dictionary
         product_dict = {
             "name": name,
             "type": type,
@@ -80,19 +81,22 @@ async def create_product(
             "description": description,
             "stock": stock,
             "category_id": str(category["_id"]),
-            "image": str(image_path),
+            "image": str(image_path),  # Save the image path in the database
         }
 
+        # Insert the product into the database
         result = products_collection.insert_one(product_dict)
         product_dict["_id"] = str(result.inserted_id)
         product_dict["id"] = product_dict.pop("_id")
+
+        # Exclude the image field from the response
         product_dict.pop("image", None)
 
         return product_dict
 
     except Exception as e:
+        print("Error al procesar el producto:", e)
         raise HTTPException(status_code=422, detail=str(e))
-
 
 
 @router.put("/actualizar/{product_id}", response_model=Product)
@@ -113,6 +117,7 @@ async def modify_product(
 
     update_data = {}
 
+    # Update fields if provided
     if name:
         update_data["name"] = name.strip().title()
     if type:
@@ -130,17 +135,15 @@ async def modify_product(
             raise HTTPException(status_code=404, detail=f"La categoría '{category_name}' no existe.")
         update_data["category_id"] = str(category["_id"])
 
+    # Handle image update
     if image:
-        image_bytes = await image.read()
-        resized_image_bytes = resize_image(image_bytes)
-
         image_filename = f"{(update_data.get('name') or db_product['name']).replace(' ', '_')}.jpg"
         image_path = IMAGE_FOLDER / image_filename
         with open(image_path, "wb") as f:
-            f.write(resized_image_bytes)
-
+            f.write(await image.read())
         update_data["image"] = str(image_path)
 
+    # Update the product in the database
     products_collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
 
     return get_product_by_id(product_id)
@@ -300,4 +303,4 @@ async def update_product_sizes():
                     {"$set": {"size": updated_sizes}}
                 )
 
-    return {"message": "Talles numéricos actualizados correctamente para todos los productos."}
+    return {"message": "Talles numéricos actualizados correctamente para todos los productos."} 

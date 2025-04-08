@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edición de Productos</title>
+    <link rel="stylesheet" href="agregar_producto.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header__logo-search">
+          <a href="#" class="header__logo-link">
+            <img src="./../../images/logoCOTITORecortadopng.png" alt="Logo Emprendimiento" class="header__logo-img" />
+          </a>
+        </div>
+        <!-- Navegación principal dentro del header -->
+        <nav class="header__nav">
+          <ul class="header__nav-list">
+            <li><a href="../../index.html" class="header__nav-link">Inicio</a></li>
+            <li><a href="#" class="header__nav-link">Agregar Producto</a></li>
+            <li><a href="./editar_producto.html" class="header__nav-link open-login-modal">Editar Productos</a></li>
+            <li><a href="#" class="header__nav-link open-login-modal">Agregar Categorías</a></li>
+            <li><a href="#" class="header__nav-link open-login-modal">Editar Categorías</a></li>
+          </ul>
+        </nav>
+        <!-- Botones a la derecha -->
+        <div class="header__actions">
+          <button id="darkModeToggle" class="btn btn--dark-mode" aria-label="Alternar modo oscuro" title="Cambiar tema">
+            <span class="dark-mode-icon">
+              <i class="fas fa-moon moon-icon"></i>
+              <i class="fas fa-sun sun-icon"></i>
+            </span>
+          </button>
+        </div>
+      </header>
+
+    <div class="products-container">
+        <h2>Lista de Productos</h2>
+        
+        <div class="table-responsive">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Tipo</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Ejemplo de datos estáticos -->
+                    <tr>
+                        <td>Remera Algodón</td>
+                        <td>Indumentaria</td>
+                        <td>Camiseta</td>
+                        <td>50</td>
+                        <td class="actions">
+                            <button class="btn-edit" onclick="openEditModal(0)"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="deleteProduct(0)"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <!-- Más filas dinámicas se agregarían con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Editar Producto</h2>
+            <form id="editForm" class="product-form">
+                <div class="form-grid">
+                    <!-- Nombre (ocupará toda la fila) -->
+                    <div class="form-group full-width">
+                      <label for="name">Nombre del producto</label>
+                      <input type="text" id="name" name="name" placeholder="Ej: Remera básica" required>
+                    </div>
+                  
+                    <!-- Fila con 3 columnas -->
+                    <div class="form-group category">
+                      <label for="category">Categoría</label>
+                      <select id="category" name="category" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="indumentaria">Indumentaria</option>
+                        <option value="calzado">Calzado</option>
+                        <option value="accesorios">Accesorios</option>
+                      </select>
+                    </div>
+                  
+                    <div class="form-group type">
+                      <label for="type">Tipo</label>
+                      <input type="text" id="type" name="type" placeholder="Ej: Camiseta, Zapatillas, Gorra..." required>
+                    </div>
+                  
+                    <div class="form-group stock">
+                      <label for="stock">Cantidad en stock</label>
+                      <input type="number" id="stock" name="stock" min="0" placeholder="Ej: 50" required>
+                    </div>
+            
+                    
+                    <div class="form-group full-width">
+                      <label for="description">Descripción</label>
+                      <textarea id="description" name="description" placeholder="Descripción del producto" required></textarea>
+                    </div>
+            
+                    <div class="form-group full-width">
+                      <label>Talles disponibles</label>
+                      <div class="sizes-grid">
+                        <label class="size-option">
+                          <input type="checkbox" name="sizes" value="XS">
+                          <span class="size-label">XS</span>
+                        </label>
+                        <label class="size-option">
+                          <input type="checkbox" name="sizes" value="S">
+                          <span class="size-label">S</span>
+                        </label>
+                        <label class="size-option">
+                          <input type="checkbox" name="sizes" value="M">
+                          <span class="size-label">M</span>
+                        </label>
+                        <label class="size-option">
+                          <input type="checkbox" name="sizes" value="L">
+                          <span class="size-label">L</span>
+                        </label>
+                        <label class="size-option">
+                          <input type="checkbox" name="sizes" value="XL">
+                          <span class="size-label">XL</span>
+                      </div>
+                    </div>
+                  </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/modal_edicion_productos"></script>
+    <script src="../../js/modo_oscuro.js"></script>
+</body>
+</html>

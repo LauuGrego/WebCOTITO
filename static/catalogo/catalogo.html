@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>COTITO - Catálogo</title>
+  <link rel="stylesheet" href="catalogo.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="./../images/logoCOTITORecortadopng.png" rel="icon" type="image/png" sizes="16x16">
+  <!-- Iconos para el botón de modo oscuro -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header__logo-search">
+    <!-- Botón de menú para móviles -->
+    <button class="header__menu-toggle" aria-label="Mostrar menú">
+      <i class="fas fa-bars"></i>
+    </button>
+    <a href="#" class="header__logo-link">
+      <img src="./../../images/logoCOTITORecortadopng.png" alt="Logo Emprendimiento" class="header__logo-img" />
+    </a>
+    <!-- Barra de búsqueda -->
+    <div class="header__search">
+      <input type="text" class="header__search-input" placeholder="Buscar productos...">
+      <button class="btn btn--ghost header__search-btn" aria-label="Buscar">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Navegación principal dentro del header -->
+  <nav class="header__nav">
+    <ul class="header__nav-list">
+      <li><a href="../../index.html" class="header__nav-link">Inicio</a></li>
+      <li><a href="#contact" class="header__nav-link">Contacto</a></li>
+      <li><a href="#" class="header__nav-link open-login-modal">Gestión de Productos</a></li>
+    </ul>
+  </nav>
+  <!-- Botones a la derecha -->
+  <div class="header__actions">
+    <button id="darkModeToggle" class="btn btn--dark-mode" aria-label="Alternar modo oscuro" title="Cambiar tema">
+      <span class="dark-mode-icon">
+        <i class="fas fa-moon moon-icon"></i>
+        <i class="fas fa-sun sun-icon"></i>
+      </span>
+    </button>
+  </div>
+</header>
+
+<!-- Overlay para vista móvil -->
+<div class="overlay" id="overlay"></div>
+
+  <!-- CONTENEDOR GENERAL -->
+  <div class="container">
+    <!-- SIDEBAR DE CATEGORÍAS -->
+    <aside class="sidebar">
+      <nav class="mobile-nav">
+        <ul>
+          <li><a href="../../index.html" class="mobile-nav-link">Inicio</a></li>
+          <li><a href="#contact" class="mobile-nav-link">Contacto</a></li>
+          <li><a href="#" class="mobile-nav-link open-login-modal">Gestión de Productos</a></li>
+        </ul>
+      </nav>
+      <h2 class="sidebar__title">Categorías</h2>
+      <ul class="sidebar__list">
+        <li><a href="#" class="sidebar__link">Ropa Bebé</a></li>
+        <li><a href="#" class="sidebar__link">Ropa Niños</a></li>
+        <li><a href="#" class="sidebar__link">Accesorios</a></li>
+      </ul>
+    </aside>
+
+    <!-- SECCIÓN PRINCIPAL (CATÁLOGO) -->
+    <main class="catalog">
+      <div class="catalog__cards">
+        <!-- Card 1 -->
+        <div class="card">
+          <img src="./../../images/conjunto1.jpg" alt="Producto 1" class="card__image" />
+          <div class="card__info">
+            <h2 class="card__title">Producto 1</h2>
+            <p class="card__description">Descripción breve del producto. Comodidad y estilo en un solo diseño.</p>
+            <div class="card__footer">
+              <span class="card__price">$29.99</span>
+              <div class="card__footer">
+                <div class="card__buttons">
+                  <button class="ver-detalles-btn" data-producto-id="1">Ver detalles</button>
+                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Consultar
+                  </a>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="card">
+          <img src="./../../images/monito1.jpg" alt="Producto 2" class="card__image" />
+          <div class="card__info">
+            <h2 class="card__title">Producto 2</h2>
+            <p class="card__description">Diseño único para los más pequeños. Calidad garantizada.</p>
+            <div class="card__footer">
+              <span class="card__price">$34.99</span>
+              <div class="card__footer">
+                <div class="card__buttons">
+                  <button class="ver-detalles-btn" data-producto-id="2">Ver detalles</button>
+                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Consultar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="card">
+          <img src="./../../images/vestido1.jpeg" alt="Producto 3" class="card__image" />
+          <div class="card__info">
+            <h2 class="card__title">Producto 3</h2>
+            <p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt consequatur molestiae quam aperiam error porro quae, aut libero iure earum totam tempora culpa dolores blanditiis fuga sed soluta. Dolorem, sint.</p>
+            <div class="card__footer">
+              <span class="card__price">$39.99</span>
+              <div class="card__footer">
+                <div class="card__buttons">
+                  <button class="ver-detalles-btn" data-producto-id="3">Ver detalles</button>
+                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Consultar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+            <img src="./../../images/niño1.png" alt="Producto 4" class="card__image" />
+            <div class="card__info">
+              <h2 class="card__title">Producto 4</h2>
+              <p class="card__description">Ropa cómoda y moderna, perfecta para cualquier ocasión.</p>
+              <div class="card__footer">
+                <span class="card__price">$39.99</span>
+                <div class="card__footer">
+                  <div class="card__buttons">
+                    <button class="ver-detalles-btn" data-producto-id="4">Ver detalles</button>
+                    <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                      <i class="fab fa-whatsapp"></i> Consultar
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <img src="./../../images/niña1.jpg" alt="Producto 5" class="card__image" />
+            <div class="card__info">
+              <h2 class="card__title">Producto 5</h2>
+              <p class="card__description">Ropa cómoda y moderna, perfecta para cualquier ocasión.</p>
+              <div class="card__footer">
+                <span class="card__price">$39.99</span>
+                <div class="card__footer">
+                  <div class="card__buttons">
+                    <button class="ver-detalles-btn" data-producto-id="5">Ver detalles</button>
+                    <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                      <i class="fab fa-whatsapp"></i> Consultar
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="contact" class="footer">
+    <div class="footer__content">
+      <div class="footer__social">
+        <a href="#" class="footer__social-link footer__social-link--instagram">
+          <img src="../../images/Instagram.png" alt="Redireccion a Instagram">
+        </a>
+        <a href="#" class="footer__social-link footer__social-link--whatsapp">
+          <img src="../../images/Whatsapp.png" alt="Redireccion a Whatsapp">
+        </a>
+      </div>
+      <p class="footer__copy">©2025 Lautaro Gregoraschuk. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <div id="loginModal" class="modal">
+    <div class="modal__overlay" id="modalOverlay"></div>
+    <div class="modal__content">
+      <button class="modal__close" id="closeModal" aria-label="Cerrar">&times;</button>
+      <!-- Reutiliza aquí tu markup de login -->
+      <div class="login-card">
+        <h1 class="login-title">Iniciar Sesión</h1>
+        <form class="login-form">
+          <div class="form-group">
+            <label for="modal-user">Usuario:</label>
+            <input type="text" id="modal-user" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="modal-password">Contraseña:</label>
+            <input type="password" id="modal-password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn--primary login-btn">Ingresar</button>
+          <div class="login-links">
+            <a href="#" class="login-link">¿Olvidaste tu contraseña?</a>
+            <!-- <a href="#" class="login-link">Registrarse</a> -->
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="./../../js/modo_oscuro.js"></script>
+  <script src="./../../js/menu.js"></script>
+  <script src="./../../js/detalles_product.js"></script>
+  <script src="./../../js/login_catalogo.js"></script>
+</body>
+</html>
