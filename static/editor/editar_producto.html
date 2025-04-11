@@ -4,36 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edición de Productos</title>
-    <link rel="stylesheet" href="agregar_producto.css">
+    <link rel="stylesheet" href="editar_producto.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
-        <div class="header__logo-search">
-          <a href="#" class="header__logo-link">
-            <img src="./../../images/logoCOTITORecortadopng.png" alt="Logo Emprendimiento" class="header__logo-img" />
-          </a>
+        <div class="header__logo">
+            <a href="#" class="header__logo-link">
+                <img src="./../../images/logoCOTITORecortadopng.png" alt="Logo Emprendimiento" class="header__logo-img" />
+            </a>
         </div>
+            <div class="header__search">
+            <!-- Barra de búsqueda -->
+            <form class="header__search-form">
+                <input type="text" class="header__search-input" placeholder="Buscar productos..." aria-label="Buscar productos">
+                <button type="submit" class="header__search-button" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
         <!-- Navegación principal dentro del header -->
         <nav class="header__nav">
-          <ul class="header__nav-list">
-            <li><a href="../../index.html" class="header__nav-link">Inicio</a></li>
-            <li><a href="#" class="header__nav-link">Agregar Producto</a></li>
-            <li><a href="./editar_producto.html" class="header__nav-link open-login-modal">Editar Productos</a></li>
-            <li><a href="#" class="header__nav-link open-login-modal">Agregar Categorías</a></li>
-            <li><a href="#" class="header__nav-link open-login-modal">Editar Categorías</a></li>
-          </ul>
+            <ul class="header__nav-list">
+                <li><a href="../../index.html" class="header__nav-link">Inicio</a></li>
+                <li><a href="./agregar_producto.html" class="header__nav-link">Agregar Producto</a></li>
+                <li><a href="./editar_producto.html" class="header__nav-link open-login-modal">Editar Productos</a></li>
+                <li><a href="./gestion_categorias.html" class="header__nav-link open-login-modal">Gestionar Categorías</a></li>
+            </ul>
         </nav>
         <!-- Botones a la derecha -->
         <div class="header__actions">
-          <button id="darkModeToggle" class="btn btn--dark-mode" aria-label="Alternar modo oscuro" title="Cambiar tema">
-            <span class="dark-mode-icon">
-              <i class="fas fa-moon moon-icon"></i>
-              <i class="fas fa-sun sun-icon"></i>
-            </span>
-          </button>
+            <button id="darkModeToggle" class="btn btn--dark-mode" aria-label="Alternar modo oscuro" title="Cambiar tema">
+                <span class="dark-mode-icon">
+                    <i class="fas fa-moon moon-icon"></i>
+                    <i class="fas fa-sun sun-icon"></i>
+                </span>
+            </button>
         </div>
-      </header>
+    </header>
 
     <div class="products-container">
         <h2>Lista de Productos</h2>
@@ -50,18 +59,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Ejemplo de datos estáticos -->
-                    <tr>
-                        <td>Remera Algodón</td>
-                        <td>Indumentaria</td>
-                        <td>Camiseta</td>
-                        <td>50</td>
-                        <td class="actions">
-                            <button class="btn-edit" onclick="openEditModal(0)"><i class="fas fa-edit"></i></button>
-                            <button class="btn-delete" onclick="deleteProduct(0)"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <!-- Más filas dinámicas se agregarían con JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -106,6 +103,18 @@
                       <label for="description">Descripción</label>
                       <textarea id="description" name="description" placeholder="Descripción del producto" required></textarea>
                     </div>
+
+                    <div class="form-group full-width">
+                        <label for="productImage">Imagen del producto</label>
+                        <div class="image-upload-container">
+                            <div class="upload-area" onclick="document.getElementById('productImageInput').click()">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <p>Arrastra y suelta una imagen aquí o haz clic para seleccionar</p>
+                            </div>
+                            <input type="file" id="productImageInput" class="hidden" accept="image/*" multiple>
+                            <div class="image-preview" id="imagePreview"></div>
+                        </div>
+                    </div>
             
                     <div class="form-group full-width">
                       <label>Talles disponibles</label>
@@ -136,12 +145,23 @@
                     <button type="submit" class="submit-button">
                         <i class="fas fa-save"></i> Guardar Cambios
                     </button>
+                    <button type="button" class="close-button" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="../../js/modal_edicion_productos"></script>
+    <script src="../../js/modal_edicion_productos.js"></script>
     <script src="../../js/modo_oscuro.js"></script>
+    <script>
+        function toggleMenu() {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+    </script>
 </body>
 </html>

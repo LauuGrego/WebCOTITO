@@ -1,4 +1,7 @@
-:root {
+/* ===================================================================
+   VARIABLES (Colores, modo claro y modo oscuro)
+   =================================================================== */
+   :root {
     /* Colores modo claro */
     --color-1: #F3F4F6;
     --color-2: #E5E7EB;
@@ -33,13 +36,14 @@
     --dm-color-principal-light: #6ba4b5;
   }
   
-  /* Estilos generales */
+  /* ===================================================================
+     ESTILOS BASE Y GENERALES
+     =================================================================== */
   body {
     background-color: var(--color-2);
-    font-family: 'Montserrat', sans-serif;
     color: var(--color-10);
     margin: 0;
-    padding-top: 120px;
+    padding-top: 120px; /* Espacio para header fijo */
     min-height: 100vh;
   }
   
@@ -48,8 +52,11 @@
     color: var(--dm-color-6);
   }
   
+  /* ===================================================================
+     HEADER Y NAVEGACIÓN (Desktop)
+     =================================================================== */
   /* HEADER GENERAL */
-.header {
+  .header {
     position: fixed;
     top: 0;
     width: 100%;
@@ -80,7 +87,7 @@
     margin-left: 20px;
   }
   
-  /* NAVEGACIÓN */
+  /* NAVEGACIÓN (Desktop) */
   .header__nav {
     flex: 1;
     text-align: center;
@@ -113,42 +120,8 @@
   body.dark-mode .header__nav-link:hover {
     color: var(--dm-color-principal);
   }
-
-  /* Añade estas reglas al existente body.dark-mode */
-body.dark-mode .form-group label {
-  color: var(--dm-color-6);
-}
-
-body.dark-mode .form-container h2 {
-  color: var(--dm-color-7);
-}
-
-body.dark-mode ::placeholder {
-  color: var(--dm-color-5) !important;
-}
-
-body.dark-mode input:-webkit-autofill,
-body.dark-mode input:-webkit-autofill:hover, 
-body.dark-mode input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--dm-color-6);
-  -webkit-box-shadow: 0 0 0px 1000px var(--dm-color-3) inset;
-}
-
-/* Ajustes específicos para selects en modo oscuro */
-body.dark-mode select {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9d1d9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-}
-
-/* Mejora de contrastes para mejor legibilidad */
-body.dark-mode .size-label:hover {
-  border-color: var(--dm-color-principal-light);
-}
-
-body.dark-mode .submit-button:hover {
-  box-shadow: 0 8px 20px rgba(61, 125, 143, 0.6);
-}
   
-  /* ACCIONES DERECHA (modo oscuro) */
+  /* Botones de acciones */
   .header__actions {
     display: flex;
     align-items: center;
@@ -176,7 +149,7 @@ body.dark-mode .submit-button:hover {
     color: var(--dm-color-principal);
   }
   
-  /* ICONOS DEL BOTÓN DE MODO OSCURO */
+  /* ICONOS del botón dark mode */
   .dark-mode-icon i {
     display: none;
   }
@@ -189,13 +162,10 @@ body.dark-mode .submit-button:hover {
     display: inline;
   }
   
-  /* SEPARACIÓN DEL CONTENIDO PRINCIPAL */
-  body {
-    padding-top: 120px;
-  }
-  
-  
-  /* Contenedor del formulario */
+  /* ===================================================================
+     FORMULARIOS Y CONTENIDO
+     =================================================================== */
+  /* Contenedor del Formulario */
   .form-container {
     background-color: var(--color-1);
     border-radius: 20px;
@@ -205,7 +175,7 @@ body.dark-mode .submit-button:hover {
     margin: 2rem auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
-
+  
   .form-container h2 {
     text-align: center;
     margin-bottom: 2rem;
@@ -219,6 +189,7 @@ body.dark-mode .submit-button:hover {
     gap: 2rem;
   }
   
+  /* Grid del Formulario */
   .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -234,24 +205,23 @@ body.dark-mode .submit-button:hover {
     justify-content: center;
   }
   
-  /* Añade estas reglas */
-.form-group.category {
-  grid-column: 1;
-}
-
-.form-group.type {
-  grid-column: 2;
-  width: 90%;
-}
-
-.form-group.stock {
-  grid-column: 3;
-}
-
-/* Asegura que los grupos usen el espacio completo */
-.form-group:not(.full-width) {
-  grid-column: auto;
-}
+  .form-group.category {
+    grid-column: 1;
+  }
+  
+  .form-group.type {
+    grid-column: 2;
+    width: 90%;
+  }
+  
+  .form-group.stock {
+    grid-column: 3;
+  }
+  
+  .form-group:not(.full-width) {
+    grid-column: auto;
+  }
+  
   .form-group.full-width {
     grid-column: 1 / -1;
   }
@@ -263,8 +233,18 @@ body.dark-mode .submit-button:hover {
     color: var(--color-8);
     font-size: 0.95rem;
   }
+
+  body.dark-mode .form-container h2 {
+    color: var(--dm-color-6);
+  }
+
+  body.dark-mode .form-group label {
+    color: var(--dm-color-6);
+  }
   
-  /* Campos de entrada */
+  /* ===================================================================
+     CAMPOS DE ENTRADA (Inputs, Select, Textarea)
+     =================================================================== */
   input,
   select,
   textarea {
@@ -300,7 +280,9 @@ body.dark-mode .submit-button:hover {
     outline: none;
   }
   
-  /* Talles disponibles */
+  /* ===================================================================
+     TALLAS DISPONIBLES
+     =================================================================== */
   .sizes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
@@ -347,7 +329,9 @@ body.dark-mode .submit-button:hover {
     transform: scale(1.05);
   }
   
-  /* Botón de enviar */
+  /* ===================================================================
+     BOTÓN DE ENVIAR
+     =================================================================== */
   .form-actions {
     text-align: center;
     margin-top: 1.5rem;
@@ -374,7 +358,103 @@ body.dark-mode .submit-button:hover {
     background: linear-gradient(135deg, var(--color-principal-dark), var(--color-principal));
   }
   
-  /* Modo oscuro */
+  /* ===================================================================
+     CARGA DE IMÁGENES
+     =================================================================== */
+  .image-upload-container {
+    border: 2px solid var(--color-3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .upload-area {
+    border: 2px dashed var(--color-principal);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .upload-area:hover {
+    background-color: var(--color-2);
+    border-color: var(--color-principal-dark);
+  }
+
+  body.dark-mode .upload-area:hover {
+    background-color: var(--dm-color-3);
+    border-color: var(--dm-color-principal-dark);
+  }
+  
+  .upload-icon {
+    font-size: 2.5rem;
+    color: var(--color-principal);
+    margin-bottom: 1rem;
+  }
+  
+  .upload-label {
+    background-color: var(--color-principal);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .upload-label:hover {
+    background-color: var(--color-principal-dark);
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  .image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .preview-image {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+  }
+  
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .remove-image:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+  }
+  
+  /* ===================================================================
+     DARK MODE: FORMULARIO & ELEMENTOS (SIN MOBILE)
+     =================================================================== */
   body.dark-mode .form-container {
     background: var(--dm-color-2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -404,34 +484,223 @@ body.dark-mode .submit-button:hover {
     background: linear-gradient(135deg, var(--dm-color-principal), var(--dm-color-principal-dark));
   }
   
-  /* Responsive */
-  @media (max-width: 768px) {
-    .form-container {
-      width: 95%;
-      padding: 1.5rem;
-    }
+  /* ===================================================================
+     MOBILE MENU (Oculto en Desktop, visible en Mobile)
+     =================================================================== */
+  .mobile-menu {
+    /* Se activa en media query */
+    display: none;
+  }
   
+  /* ===================================================================
+     MEDIA QUERIES (MOBILE - hasta 768px)
+     =================================================================== */
+  @media (max-width: 768px) {
+    /* HEADER y Navegación Mobile */
+    .header {
+      height: auto;
+      min-height: 60px;
+      padding: 0.5rem 1rem;
+      flex-direction: column;
+      align-items: stretch;
+      position: relative;
+    }
+    
+    .header__logo-search {
+      display: none;
+    }
+    
+    .header__nav {
+      display: none;
+      width: 100%;
+      order: 3;
+      margin-top: 0;
+      z-index: 1000;
+    }
+    
+    .header__nav.active {
+      display: block;
+    }
+    
+    .header__nav-list {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0;
+      overflow: visible;
+    }
+    
+    .header__nav-link {
+      padding: 0.8rem;
+      border-radius: 8px;
+      background-color: var(--color-2);
+      display: block;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    
+    .header__nav-link:hover {
+      background-color: var(--color-principal);
+      color: white;
+    }
+    
+    /* Menú Hamburguesa (Mobile) */
+    .hamburger-menu {
+      display: block;
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      z-index: 1001;
+    }
+    
+    .hamburger-menu span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background-color: var(--color-8);
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+    
+    .header__actions {
+      position: absolute;
+      right: -35px;
+      top: 50%;
+      transform: translateY(-50%);
+      margin: 0;
+    }
+    
+    /* FORMULARIO Mobile */
+    .form-container {
+      width: 90%;
+      max-width: 100%;
+      padding: 0.5rem;
+      margin: 0 auto;
+      border-radius: 0;
+    }
+    
     .form-grid {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
-  
-    .submit-button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    body {
-      padding: 1rem;
-      padding-top: 100px;
-    }
-  
-    .form-container {
-      padding: 1rem;
-    }
-  
+    
     .sizes-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .image-preview {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    input, textarea {
+      width: 100%;
+      max-width: 85%;
+    }
+    
+    select {
+      width: 100%;
+      max-width: 95%;
+    }
+    
+    label {
+      width: 70%;
+    }
+    
+    .type input {
+      width: 100%;
+      max-width: 95%;
+    }
+    
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      padding: 0;
+    }
+    
+    body {
+      position: relative;
+    }
+    
+    /* MOBILE MENU */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -350px; /* Se oculta fuera del viewport */
+      width: 250px;
+      height: 100%;
+      background-color: var(--color-1);
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 1100;
+      transition: right 0.3s ease;
+      padding: 1rem;
+      display: flex;
+    }
+    
+    .mobile-menu.active {
+      right: 0;
+    }
+    
+    .mobile-nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .mobile-nav-link {
+      display: block;
+      text-decoration: none;
+      color: var(--color-10);
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--color-3);
+      transition: background 0.3s ease;
+    }
+    
+    .mobile-nav-link:hover {
+      background-color: var(--color-2);
+    }
+    
+    /* OVERLAY para MENU MOBILE */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Modo Oscuro en Mobile */
+    body.dark-mode .hamburger-menu span {
+      background-color: var(--dm-color-6);
+    }
+    
+    body.dark-mode .mobile-menu {
+      background-color: var(--dm-color-2);
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.6);
+    }
+    
+    body.dark-mode .mobile-nav-link {
+      color: var(--dm-color-6);
+      border-bottom: 1px solid var(--dm-color-4);
+    }
+    
+    body.dark-mode .mobile-nav-link:hover {
+      background-color: var(--dm-color-principal);
+      color: #fff;
+    }
+    
+    body.dark-mode .menu-overlay {
+      background-color: rgba(0, 0, 0, 0.7);
     }
   }
+  

@@ -463,9 +463,9 @@ body {
 
 .header__nav-list {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   list-style: none;
-  margin-left: 700px;
+  margin-left: 400px;
 }
 
 .header__nav-link {
@@ -896,6 +896,7 @@ body {
   background: var(--color-principal);
   box-shadow: 0 8px 20px rgba(112, 144, 155, 0.4);
   transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+  margin-top: 30px;
 }
 
 .modal__content .btn--primary:hover {

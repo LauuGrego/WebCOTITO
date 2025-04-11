@@ -9,6 +9,11 @@
       </head>
 <body>
     <header class="header">
+      <div class="hamburger-menu" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
         <div class="header__logo-search">
           <a href="#" class="header__logo-link">
             <img src="./../../images/logoCOTITORecortadopng.png" alt="Logo Emprendimiento" class="header__logo-img" />
@@ -20,8 +25,7 @@
             <li><a href="../../index.html" class="header__nav-link">Inicio</a></li>
             <li><a href="#" class="header__nav-link">Agregar Producto</a></li>
             <li><a href="./editar_producto.html" class="header__nav-link open-login-modal">Editar Productos</a></li>
-            <li><a href="#" class="header__nav-link open-login-modal">Agregar Categorías</a></li>
-            <li><a href="#" class="header__nav-link open-login-modal">Editar Categorías</a></li>
+            <li><a href="./gestion_categorias.html" class="header__nav-link open-login-modal">Gestionar Categorías</a></li>
           </ul>
         </nav>
         <!-- Botones a la derecha -->
@@ -35,16 +39,42 @@
         </div>
       </header>
 
+      <aside class="mobile-menu">
+        <ul class="mobile-nav-list">
+          <li><a href="../../index.html" class="mobile-nav-link">Inicio</a></li>
+          <li><a href="#" class="mobile-nav-link">Agregar Producto</a></li>
+          <li><a href="./editar_producto.html" class="mobile-nav-link open-login-modal">Editar Productos</a></li>
+          <li><a href="./gestion_categorias.html" class="mobile-nav-link open-login-modal">Agregar Categorías</a></li>
+        </ul>
+      </aside>
+
+      <div class="menu-overlay" onclick="toggleMenu()"></div>
+
   <div class="form-container">
     <h2>Carga de Producto</h2>
     <form id="productForm" class="product-form">
       <div class="form-grid">
         <!-- Nombre (ocupará toda la fila) -->
-        <div class="form-group full-width">
+        <div class="form-group full-width name">
           <label for="name">Nombre del producto</label>
           <input type="text" id="name" name="name" placeholder="Ej: Remera básica" required>
         </div>
       
+           <!-- Sección de carga de imágenes añadida -->
+        <div class="form-group full-width">
+          <label for="image-upload">Imágenes del producto</label>
+          <div class="image-upload-container">
+            <div class="upload-area" id="drop-zone">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <p>Arrastra y suelta imágenes aquí o</p>
+              <label for="image-upload" class="upload-label">Selecciona archivos</label>
+              <input type="file" id="image-upload" name="images" accept="image/*" multiple 
+                     class="hidden" onchange="handleFileSelect(event)">
+            </div>
+            <div class="image-preview" id="image-preview"></div>
+          </div>
+        </div>
+
         <!-- Fila con 3 columnas -->
         <div class="form-group category">
           <label for="category">Categoría</label>
@@ -104,6 +134,17 @@
       </div>
     </form>
   </div>
+
+<script>
+       function toggleMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const overlay = document.querySelector('.menu-overlay');
+        mobileMenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+      }
+</script>
+
 <script src="../../js/modo_oscuro.js"></script>
+<script src="../../js/imagenes.js"></script>
 </body>
 </html>
