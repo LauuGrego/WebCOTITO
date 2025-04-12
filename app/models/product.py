@@ -9,10 +9,13 @@ class ProductBase(BaseModel):
     size: List[str]
     description: Optional[str] = None
     stock: int
-    image: Optional[bytes] = None  # Cambiado a bytes para almacenar imágenes
+    image: Optional[bytes] = None  # Store image as binary data
 
     class Config:
         from_attributes = True
+        json_encoders = {
+            bytes: lambda v: "Imagen omitida por razones de tamaño"  # Placeholder for binary data
+        }
 
 class ProductCreate(ProductBase):
     category_name: str = Field(..., description="Nombre de la categoría para buscar su ID automáticamente")
@@ -23,9 +26,6 @@ class Product(ProductBase):
 
     class Config:
         from_attributes = True
-        json_encoders = {
-            bytes: lambda v: "Imagen omitida por razones de tamaño"  # Placeholder for binary data
-        }
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None

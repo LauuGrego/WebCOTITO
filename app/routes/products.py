@@ -62,11 +62,8 @@ async def create_product(
         category_name = category_name.strip().title()
         size_list = [s.strip().title() for s in size.split(",") if s.strip()]
 
-        # Save the image to the products_image folder
-        image_filename = f"{name.replace(' ', '_')}.jpg"
-        image_path = IMAGE_FOLDER / image_filename
-        with open(image_path, "wb") as f:
-            f.write(await image.read())
+        # Read the image as binary data
+        image_data = await image.read()
 
         # Check if the category exists
         category = categories_collection.find_one({"name": category_name})
@@ -81,7 +78,7 @@ async def create_product(
             "description": description,
             "stock": stock,
             "category_id": str(category["_id"]),
-            "image": str(image_path),  # Save the image path in the database
+            "image": image_data,  # Save the image as binary data in the database
         }
 
         # Insert the product into the database
@@ -137,11 +134,8 @@ async def modify_product(
 
     # Handle image update
     if image:
-        image_filename = f"{(update_data.get('name') or db_product['name']).replace(' ', '_')}.jpg"
-        image_path = IMAGE_FOLDER / image_filename
-        with open(image_path, "wb") as f:
-            f.write(await image.read())
-        update_data["image"] = str(image_path)
+        image_data = await image.read()
+        update_data["image"] = image_data
 
     # Update the product in the database
     products_collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
@@ -209,19 +203,19 @@ async def whatsapp_redirect(product_name: str):
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado.")
     
-    # Get the product image path
-    image_path = product.get("image")
-    if not image_path or not os.path.exists(image_path):
+    # Get the product image
+    image_data = product.get("image")
+    if not image_data:
         raise HTTPException(status_code=404, detail="Imagen del producto no encontrada.")
     
     # Construct the WhatsApp message
     message = f"¡Hola! Quiero saber más info acerca de {product_name}."
     whatsapp_url = f"https://wa.me/3445417684?text={message}"
     
-    # Return the WhatsApp URL and the image path
+    # Return the WhatsApp URL and the image data
     return {
         "url": whatsapp_url,
-        "image_path": image_path
+        "image": "Imagen omitida por razones de tamaño"  # Placeholder for binary data
     }
 
 
@@ -303,4 +297,4 @@ async def update_product_sizes():
                     {"$set": {"size": updated_sizes}}
                 )
 
-    return {"message": "Talles numéricos actualizados correctamente para todos los productos."} 
+    return {"message": "Talles numéricos actualizados correctamente para todos los productos."}
