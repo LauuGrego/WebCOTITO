@@ -48,44 +48,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         const category = link.dataset.category;
         const type = link.dataset.type;
 
-        let url = "";
-        if (category) {
-          url = `http://127.0.0.1:8000/productos/buscar?category=${encodeURIComponent(category)}`;
-        } else if (type) {
-          url = `http://127.0.0.1:8000/productos/buscar?type=${encodeURIComponent(type)}`;
-        }
+        const params = new URLSearchParams();
+        if (category) params.append("category", category);
+        if (type) params.append("type", type);
 
-        if (url) {
-          try {
-            const response = await fetch(url);
-            if (!response.ok) {
-              throw new Error(`Error fetching products: ${response.statusText}`);
-            }
-            const products = await response.json();
+        try {
+          const response = await fetch(`http://127.0.0.1:8000/productos/buscar_por_categoria_o_tipo?${params.toString()}`);
+          if (!response.ok) {
+            throw new Error(`Error fetching products: ${response.statusText}`);
+          }
+          const products = await response.json();
 
-            // Clear existing products and display new ones
-            catalogCards.innerHTML = "";
-            products.forEach(product => {
-              const card = `
-                <div class="card">
-                  <img src="${product.image_path}" alt="${product.name}" class="card__image">
-                  <div class="card__info">
-                    <h3 class="card__title">${product.name}</h3>
-                    <p class="card__description">${product.description}</p>
-                    <div class="card__footer">
-                      <span class="card__price">$${product.price || "N/A"}</span>
-                      <div class="card__buttons">
-                        <button class="ver-detalles-btn" onclick="window.location.href='../../static/detalle/detalle.html?id=${product.id}'">Ver Detalles</button>
-                        <a href="https://wa.me/3445417684?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>
-                      </div>
+          // Clear existing products and display new ones
+          catalogCards.innerHTML = "";
+          products.forEach(product => {
+            const card = `
+              <div class="card">
+                <img src="${product.image_path}" alt="${product.name}" class="card__image">
+                <div class="card__info">
+                  <h3 class="card__title">${product.name}</h3>
+                  <p class="card__description">${product.description}</p>
+                  <div class="card__footer">
+                    <span class="card__price">$${product.price || "N/A"}</span>
+                    <div class="card__buttons">
+                      <button class="ver-detalles-btn" onclick="window.location.href='../../static/detalle/detalle.html?id=${product.id}'">Ver Detalles</button>
+                      <a href="https://wa.me/3445417684?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>
                     </div>
                   </div>
-                </div>`;
-              catalogCards.innerHTML += card;
-            });
-          } catch (error) {
-            console.error("Error loading products:", error);
-          }
+                </div>
+              </div>`;
+            catalogCards.innerHTML += card;
+          });
+        } catch (error) {
+          console.error("Error loading products:", error);
         }
       });
     });

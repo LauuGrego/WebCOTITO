@@ -6,12 +6,16 @@ from app.db.client import db_client
 from app.routes.users_JWT_auth import admin_only, current_user, search_user
 from bson import ObjectId
 
+# Router setup
 router = APIRouter(prefix="/usuarios")
 
-# Conexión a la colección de usuarios
+# Database collection
 users_collection = db_client.users
 
-# Registrar Usuario
+# Endpoints
+# ---------
+
+# Registrar usuario
 @router.post("/registrar", status_code=201)
 async def register_user(user: UserCreate):
     context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,16 +36,14 @@ async def register_user(user: UserCreate):
 
     return {"msg": "Usuario registrado con éxito", "user_id": str(result.inserted_id)}
 
-
-
+# Listar usuarios
 @router.get("/listar", response_model=list[UserBase])
 async def list_users(admin: User = Depends(admin_only)): 
     users_cursor = users_collection.find()
     users = [UserBase(**user).model_dump() for user in users_cursor]
     return users
 
-
-#buscar usuario por nombre
+# Buscar usuario por nombre
 @router.get("/buscar/{username}", response_model=UserBase)
 async def search_user_by_username(username: str, admin: User = Depends(admin_only)): 
     user = search_user("username", username)
@@ -49,8 +51,7 @@ async def search_user_by_username(username: str, admin: User = Depends(admin_onl
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return user
 
-
-# Actualizar Usuario
+# Actualizar usuario
 @router.put("/actualizar/{username}")
 async def update_user(username: str, user_update: UserBase, admin: User = Depends(admin_only)):  
     update_data = user_update.model_dump(exclude_unset=True)
@@ -87,7 +88,7 @@ async def update_own_user(user_update: UserBase, current: User = Depends(current
 
     return {"msg": "Tu perfil ha sido actualizado con éxito"}
 
-# Deshabilitar Usuario
+# Deshabilitar usuario
 @router.put("/deshabilitar_usuario/{username}")
 async def disable_user(username: str, admin: User = Depends(admin_only)): 
     result = users_collection.update_one({"username": username}, {"$set": {"disable": True}})
@@ -96,7 +97,7 @@ async def disable_user(username: str, admin: User = Depends(admin_only)):
 
     return {"message": f"El usuario '{username}' ha sido deshabilitado exitosamente"}
 
-# Habilitar Usuario
+# Habilitar usuario
 @router.put("/habilitar_usuario/{username}")
 async def enable_user(username: str, admin: User = Depends(admin_only)): 
     result = users_collection.update_one({"username": username}, {"$set": {"disable": False}})

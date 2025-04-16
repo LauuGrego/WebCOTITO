@@ -5,10 +5,14 @@ from app.models.user import User
 from app.db.client import db_client
 from bson import ObjectId
 
+# Router setup
 router = APIRouter(prefix="/categorias", tags=["Categories"])
 
-# Colección de categorías
+# Database collection
 categories_collection = db_client.categories
+
+# Endpoints
+# ---------
 
 @router.post("/agregar", status_code=201)
 async def create_category(category: CategoryCreate, admin: User = Depends(admin_only)):
@@ -24,8 +28,7 @@ async def create_category(category: CategoryCreate, admin: User = Depends(admin_
     return new_category
 
 @router.get("/listar")
-async def list_categories(admin: User = Depends(admin_only) ):
-    
+async def list_categories(admin: User = Depends(admin_only)):
     categories = list(categories_collection.find({}, {"_id": 0, "name": 1}))
     return categories
 
@@ -77,4 +80,15 @@ async def get_category_by_id(category_id: str):
         raise HTTPException(status_code=404, detail=f"Categoría con ID {category_id} no encontrada.")
     
     print(f"Category found: {category}")
+    return {"name": category["name"]}
+
+@router.get("/obtener-nombre/{category_id}")
+async def get_category_name_by_id(category_id: str):
+    if not ObjectId.is_valid(category_id):
+        raise HTTPException(status_code=400, detail="ID de categoría no válido.")
+    
+    category = categories_collection.find_one({"_id": ObjectId(category_id)}, {"_id": 0, "name": 1})
+    if not category:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada.")
+    
     return {"name": category["name"]}

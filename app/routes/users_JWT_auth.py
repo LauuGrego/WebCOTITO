@@ -11,19 +11,25 @@ from app.db.client import db_client
 import pymongo
 from typing import Optional
 
-
+# Constants
 ALGORITHM = "HS256"
 ACCESS_TOKEN_DURATION = 200
 SECRET = "gwtfdtdgjiemlopckj98763tgcuebcdsshgdywxbg65423324r"
 
+# Router setup
 router = APIRouter()
 
+# OAuth2 setup
 oauth2 = OAuth2PasswordBearer(tokenUrl="/usuarios/login")
 
-crypt_context = CryptContext(schemes=["bcrypt"]) #algoritmo de criptografia
+# Cryptography context
+crypt_context = CryptContext(schemes=["bcrypt"])
 
+# Database collection
 users_collection = db_client.users
 
+# Helper functions
+# -----------------
 def search_user_db(field: str, key: str) -> Optional[User]:
     try:
         user = users_collection.find_one({field: key})
@@ -34,27 +40,16 @@ def search_user_db(field: str, key: str) -> Optional[User]:
         print(f"Error buscando usuario en DB: {e}")
     return None
 
-
-
 def search_user(field: str, key) -> Optional[UserBase]:
     try:
-        
         user_data = users_collection.find_one({field: key})
-        
         if user_data:
-            
             user_data["_id"] = str(user_data["_id"]) 
-            
-            
             return User(**user_data)
-        
         return None  
     except pymongo.errors.PyMongoError as e:
-        
         print(f"Error al buscar el usuario: {e}")
         return None
-
-    
 
 async def auth_user(token: str = Depends(oauth2)) -> User:
     exception = HTTPException(
@@ -83,52 +78,44 @@ async def current_user(user: User = Depends(auth_user)) -> User:
         )
     return user
 
-@router.post("/usuarios/login")
-async def login(form: OAuth2PasswordRequestForm = Depends()):
-   
-    # Verifica que los datos sean válidos
-    if not form.username or not form.password:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Faltan campos obligatorios")
-
-    # Busca el usuario en la base de datos
-    user_data = users_collection.find_one({"username": form.username})
-    if not user_data:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario Incorrecto")
-    
-    # Convertir ObjectId a cadena
-    user_data["_id"] = str(user_data["_id"])
-
-    # Crea un objeto de usuario
-    user_obj = User(**user_data)
-
-    # Verifica la contraseña
-    if not crypt_context.verify(form.password, user_obj.password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Contraseña Incorrecta")
-
-    # Genera el token de acceso
-    access_token = {
-        "sub": user_obj.username,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION),
-    }
-
-    # Log para depuración
-    print(f"Token generado para: {user_obj.username}")
-
-    return {"access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM), "token_type": "Bearer"}
-
-
-@router.get("/usuarios/yo")
-async def me(user: UserBase = Depends(current_user)):
-    # Devuelve los datos del usuario autenticado
-    return user
-
 async def admin_only(user: User = Depends(current_user)):
-    # Verifica si el usuario tiene permisos de administrador
     if user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Acceso denegado: Se requieren permisos de administrador"
         )
+
+# Endpoints
+# ---------
+
+@router.post("/usuarios/login")
+async def login(form: OAuth2PasswordRequestForm = Depends()):
+    if not form.username or not form.password:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Faltan campos obligatorios")
+
+    user_data = users_collection.find_one({"username": form.username})
+    if not user_data:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario Incorrecto")
+    
+    user_data["_id"] = str(user_data["_id"])
+
+    user_obj = User(**user_data)
+
+    if not crypt_context.verify(form.password, user_obj.password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Contraseña Incorrecta")
+
+    access_token = {
+        "sub": user_obj.username,
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION),
+    }
+
+    print(f"Token generado para: {user_obj.username}")
+
+    return {"access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM), "token_type": "Bearer"}
+
+@router.get("/usuarios/yo")
+async def me(user: UserBase = Depends(current_user)):
+    return user
 
 @router.get("/usuarios/verify-token")
 async def verify_token(token: str = Depends(oauth2)):

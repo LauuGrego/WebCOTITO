@@ -13,9 +13,9 @@ async function loadProducts(searchQuery = '') {
     }
 
     products.forEach(product => {
-      const productImage = product.image
-        ? `data:image/jpeg;base64,${product.image}`
-        : '/static/images/default-product.png'; // Default image fallback
+      const productImage = product.image_path
+        ? product.image_path
+        : '/static/images/default-product.jpg'; // Default image fallback
 
       const productCard = `
         <div class="card">

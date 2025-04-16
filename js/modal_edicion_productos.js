@@ -21,12 +21,11 @@ function renderProducts(products) {
     const tbody = document.querySelector('.products-table tbody');
     tbody.innerHTML = ""; // Limpiar contenido previo
 
-    products.forEach(async product => {
-        const categoryName = await fetchCategoryName(product.category_id);
+    products.forEach(product => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${product.name}</td>
-            <td>${categoryName}</td>
+            <td>${product.category_name || 'Sin categoría'}</td>
             <td>${product.type}</td>
             <td>${product.stock}</td>
             <td>
@@ -116,6 +115,9 @@ async function openEditModal(productId) {
         const product = await response.json();
         const form = document.getElementById('editForm');
 
+        // Clear previous data in the form
+        form.reset();
+
         // Llenar el select de categorías y marcar la categoría actual del producto
         await populateCategorySelect(product.category_id);
 
@@ -123,6 +125,7 @@ async function openEditModal(productId) {
         form.elements.name.value = product.name;
         form.elements.type.value = product.type;
         form.elements.stock.value = product.stock;
+        form.elements.price.value = product.price.toLocaleString('es-ES', { minimumFractionDigits: 2 }); // Format price
         form.elements.description.value = product.description;
 
         // Mostrar la imagen actual del producto
@@ -136,7 +139,7 @@ async function openEditModal(productId) {
             imagePreview.appendChild(img);
         }
 
-        // Marcar los talles seleccionados
+        // Actualizar los talles seleccionados
         document.querySelectorAll('input[name="sizes"]').forEach(checkbox => {
             checkbox.checked = product.size.includes(checkbox.value);
         });
@@ -160,6 +163,10 @@ async function saveProductChanges(event) {
     const productId = form.dataset.productId;
 
     const formData = new FormData(form);
+    const priceInput = form.elements.price.value.replace(/\./g, '').replace(',', '.'); // Convert to backend format
+    if (priceInput) {
+        formData.set('price', parseFloat(priceInput).toFixed(2));
+    }
     const imageInput = document.getElementById('productImageInput');
     if (imageInput.files.length > 0) {
         formData.append('image', imageInput.files[0]);

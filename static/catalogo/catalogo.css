@@ -1152,7 +1152,7 @@ body {
   /* Imagen fija a la izquierda */
   .card__image {
     width: 120px;        /* ancho fijo */
-    height: 228.55px;       /* alto fijo */
+    height: 280px;       /* alto fijo */
     object-fit: cover;
     flex-shrink: 0;
   }
