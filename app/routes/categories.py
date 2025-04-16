@@ -31,7 +31,10 @@ async def list_categories(admin: User = Depends(admin_only) ):
 
 @router.get("/listar-public")
 async def list_categories():
-    categories = list(categories_collection.find({}, {"_id": 0, "name": 1}))
+    categories = list(categories_collection.find({}, {"_id": 1, "name": 1}))
+    for category in categories:
+        category["id"] = str(category["_id"])  # Convert ObjectId to string
+        del category["_id"]  # Remove the original _id field
     return categories
 
 @router.delete("/eliminar/{category_name}")
@@ -59,11 +62,19 @@ async def search_categories_by_name(category_name: str):
 
 @router.get("/buscar-por-id/{category_id}")
 async def get_category_by_id(category_id: str):
+    # Log the incoming category_id
+    print(f"Received category_id: {category_id}")
+
+    # Validate the ObjectId
     if not ObjectId.is_valid(category_id):
+        print(f"Invalid ObjectId: {category_id}")
         raise HTTPException(status_code=400, detail="ID de categoría no válido.")
     
+    # Search for the category in the database
     category = categories_collection.find_one({"_id": ObjectId(category_id)}, {"_id": 0, "name": 1})
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada.")
+        print(f"No category found for ID: {category_id}")
+        raise HTTPException(status_code=404, detail=f"Categoría con ID {category_id} no encontrada.")
     
+    print(f"Category found: {category}")
     return {"name": category["name"]}

@@ -18,19 +18,21 @@ SECRET = "gwtfdtdgjiemlopckj98763tgcuebcdsshgdywxbg65423324r"
 
 router = APIRouter()
 
-oauth2 = OAuth2PasswordBearer(tokenUrl="login")
+oauth2 = OAuth2PasswordBearer(tokenUrl="/usuarios/login")
 
 crypt_context = CryptContext(schemes=["bcrypt"]) #algoritmo de criptografia
 
 users_collection = db_client.users
 
-def search_user_db(field: str, key:str) -> User:
-    
+def search_user_db(field: str, key: str) -> Optional[User]:
     try:
-        user= users_collection.find_one({field: key})
-        return user.User(**user)
-    except:
-        return {"error": "No se ha encontrado el usuario"}
+        user = users_collection.find_one({field: key})
+        if user:
+            user["_id"] = str(user["_id"])
+            return User(**user)
+    except Exception as e:
+        print(f"Error buscando usuario en DB: {e}")
+    return None
 
 
 
@@ -68,7 +70,7 @@ async def auth_user(token: str = Depends(oauth2)) -> User:
     except JWTError:
         raise exception
 
-    user_data = search_user("username",username)
+    user_data = search_user_db("username", username)
     if not user_data:
         raise exception
     return user_data
@@ -83,6 +85,12 @@ async def current_user(user: User = Depends(auth_user)) -> User:
 
 @router.post("/usuarios/login")
 async def login(form: OAuth2PasswordRequestForm = Depends()):
+   
+    # Verifica que los datos sean válidos
+    if not form.username or not form.password:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Faltan campos obligatorios")
+
+    # Busca el usuario en la base de datos
     user_data = users_collection.find_one({"username": form.username})
     if not user_data:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario Incorrecto")
@@ -90,27 +98,50 @@ async def login(form: OAuth2PasswordRequestForm = Depends()):
     # Convertir ObjectId a cadena
     user_data["_id"] = str(user_data["_id"])
 
- 
+    # Crea un objeto de usuario
     user_obj = User(**user_data)
 
+    # Verifica la contraseña
     if not crypt_context.verify(form.password, user_obj.password):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Contraseña Incorrecta")
 
+    # Genera el token de acceso
     access_token = {
         "sub": user_obj.username,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_DURATION),
     }
 
-    return {"access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM), "token_type": "JWT"}
+    # Log para depuración
+    print(f"Token generado para: {user_obj.username}")
+
+    return {"access_token": jwt.encode(access_token, SECRET, algorithm=ALGORITHM), "token_type": "Bearer"}
 
 
 @router.get("/usuarios/yo")
 async def me(user: UserBase = Depends(current_user)):
+    # Devuelve los datos del usuario autenticado
     return user
 
 async def admin_only(user: User = Depends(current_user)):
+    # Verifica si el usuario tiene permisos de administrador
     if user.role != "admin":
         raise HTTPException(
             status_code=403,
             detail="Acceso denegado: Se requieren permisos de administrador"
         )
+
+@router.get("/usuarios/verify-token")
+async def verify_token(token: str = Depends(oauth2)):
+    try:
+        payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(status_code=401, detail="Token inválido")
+        
+        user_data = search_user_db("username", username)
+        if not user_data:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        
+        return {"message": "Token válido", "username": username}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")

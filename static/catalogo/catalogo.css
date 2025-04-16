@@ -211,6 +211,11 @@ body.dark-mode .sidebar__link:hover {
   background-color: rgba(255,255,255,0.05);
   color: var(--text);
 }
+.sidebar__link.active {
+  font-weight: bold;
+  color: var(--color-principal);
+  text-decoration: underline;
+}
 
 /* -------------------------------------------------- */
 /* CONTENIDO PRINCIPAL & SECCIONES                    */
@@ -515,9 +520,10 @@ body {
 
 .sidebar__title {
   font-family: 'Balsamiq Sans', cursive;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: var(--color-8);
-  margin-bottom: 1rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.8rem;
   text-align: center;
 }
 
@@ -587,12 +593,30 @@ body {
   object-fit: cover;
 }
 
+.card__title {
+  font-size: 1.5rem;
+  color: var(--color-8);
+  margin-bottom: 0.5rem;
+  font-family: 'Balsamiq Sans', cursive;
+}
+
 .card__info {
   padding: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: left;
+}
+
+.card__description {
+  font-size: 0.9rem;
+  color: var(--color-5);
+  margin-bottom: 1rem;
+  display: block; /* Ensure full visibility */
+  overflow-wrap: break-word; /* Prevent text from overflowing */
+  word-wrap: break-word; /* Compatibility for older browsers */
+  word-break: break-word; /* Break long words if necessary */
+  white-space: normal; /* Allow text to wrap to the next line */
 }
 
 /* Añade estos estilos para mejorar los botones de detalles */
@@ -624,6 +648,8 @@ body {
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
+.card
 
 .card__price {
   font-weight: bold;
@@ -1046,7 +1072,7 @@ body {
     position: fixed;
     top: 0;
     left: -100%; /* Oculta fuera de la pantalla */
-    width: 40%;
+    width: 70%;
     max-width: 300px;
     height: 100%;
     background-color: var(--color-2);
@@ -1144,16 +1170,18 @@ body {
   .card__title {
     font-size: 1rem;
     margin-bottom: 0.25rem;
+    text-align: center;
   }
   .card__description {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--color-7);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     line-clamp: 2;
     -webkit-line-clamp: 2;  /* sólo 2 líneas */
     overflow: hidden;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
+    
   }
 
   /* Footer: precio y botones alineados */
@@ -1173,7 +1201,7 @@ body {
   .card__buttons {
     display: flex;
     gap: 0.5rem;
-    width: 100%;
+    width: 60%;
     flex-direction: column;
     ;
   }
@@ -1183,5 +1211,6 @@ body {
     font-size: 0.85rem;
     width: 100%;
     white-space: nowrap;
+    justify-content: center;
   }
 }

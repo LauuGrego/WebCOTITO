@@ -69,7 +69,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeEditModal()">&times;</span>
             <h2>Editar Producto</h2>
-            <form id="editForm" class="product-form">
+            <form id="editForm" class="product-form" data-product-id="">
                 <div class="form-grid">
                     <!-- Nombre (ocupará toda la fila) -->
                     <div class="form-group full-width">
@@ -82,9 +82,6 @@
                       <label for="category">Categoría</label>
                       <select id="category" name="category" required>
                         <option value="">Seleccionar...</option>
-                        <option value="indumentaria">Indumentaria</option>
-                        <option value="calzado">Calzado</option>
-                        <option value="accesorios">Accesorios</option>
                       </select>
                     </div>
                   

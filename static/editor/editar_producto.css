@@ -366,6 +366,7 @@ body.dark-mode {
 .btn-edit, .btn-delete {
     padding: 0.6rem;
     border: none;
+    margin: 7px 0;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -852,4 +853,12 @@ body.dark-mode .upload-area:hover {
 .remove-image:hover {
     background: #dc2626;
     transform: scale(1.1);
+}
+
+.image-preview img {
+    max-width: 100px;
+    max-height: 100px;
+    margin: 5px;
+    border-radius: 8px;
+    object-fit: cover;
 }

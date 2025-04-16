@@ -64,110 +64,15 @@
         </ul>
       </nav>
       <h2 class="sidebar__title">Categorías</h2>
-      <ul class="sidebar__list">
-        <li><a href="#" class="sidebar__link">Ropa Bebé</a></li>
-        <li><a href="#" class="sidebar__link">Ropa Niños</a></li>
-        <li><a href="#" class="sidebar__link">Accesorios</a></li>
+      <ul class="sidebar__list" id="sidebarCategories">
+        <!-- Categories will be dynamically loaded here -->
       </ul>
     </aside>
 
     <!-- SECCIÓN PRINCIPAL (CATÁLOGO) -->
     <main class="catalog">
-      <div class="catalog__cards">
-        <!-- Card 1 -->
-        <div class="card">
-          <img src="./../../images/conjunto1.jpg" alt="Producto 1" class="card__image" />
-          <div class="card__info">
-            <h2 class="card__title">Producto 1</h2>
-            <p class="card__description">Descripción breve del producto. Comodidad y estilo en un solo diseño.</p>
-            <div class="card__footer">
-              <span class="card__price">$29.99</span>
-              <div class="card__footer">
-                <div class="card__buttons">
-                  <button class="ver-detalles-btn" data-producto-id="1">Ver detalles</button>
-                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
-                    <i class="fab fa-whatsapp"></i> Consultar
-                  </a>
-                </div>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-        <!-- Card 2 -->
-        <div class="card">
-          <img src="./../../images/monito1.jpg" alt="Producto 2" class="card__image" />
-          <div class="card__info">
-            <h2 class="card__title">Producto 2</h2>
-            <p class="card__description">Diseño único para los más pequeños. Calidad garantizada.</p>
-            <div class="card__footer">
-              <span class="card__price">$34.99</span>
-              <div class="card__footer">
-                <div class="card__buttons">
-                  <button class="ver-detalles-btn" data-producto-id="2">Ver detalles</button>
-                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
-                    <i class="fab fa-whatsapp"></i> Consultar
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Card 3 -->
-        <div class="card">
-          <img src="./../../images/vestido1.jpeg" alt="Producto 3" class="card__image" />
-          <div class="card__info">
-            <h2 class="card__title">Producto 3</h2>
-            <p class="card__description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt consequatur molestiae quam aperiam error porro quae, aut libero iure earum totam tempora culpa dolores blanditiis fuga sed soluta. Dolorem, sint.</p>
-            <div class="card__footer">
-              <span class="card__price">$39.99</span>
-              <div class="card__footer">
-                <div class="card__buttons">
-                  <button class="ver-detalles-btn" data-producto-id="3">Ver detalles</button>
-                  <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
-                    <i class="fab fa-whatsapp"></i> Consultar
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-            <img src="./../../images/niño1.png" alt="Producto 4" class="card__image" />
-            <div class="card__info">
-              <h2 class="card__title">Producto 4</h2>
-              <p class="card__description">Ropa cómoda y moderna, perfecta para cualquier ocasión.</p>
-              <div class="card__footer">
-                <span class="card__price">$39.99</span>
-                <div class="card__footer">
-                  <div class="card__buttons">
-                    <button class="ver-detalles-btn" data-producto-id="4">Ver detalles</button>
-                    <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
-                      <i class="fab fa-whatsapp"></i> Consultar
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img src="./../../images/niña1.jpg" alt="Producto 5" class="card__image" />
-            <div class="card__info">
-              <h2 class="card__title">Producto 5</h2>
-              <p class="card__description">Ropa cómoda y moderna, perfecta para cualquier ocasión.</p>
-              <div class="card__footer">
-                <span class="card__price">$39.99</span>
-                <div class="card__footer">
-                  <div class="card__buttons">
-                    <button class="ver-detalles-btn" data-producto-id="5">Ver detalles</button>
-                    <a href="https://wa.me/" class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
-                      <i class="fab fa-whatsapp"></i> Consultar
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div class="catalog__cards" id="catalogCards">
+        <!-- Los productos se cargarán dinámicamente aquí -->
       </div>
     </main>
   </div>
@@ -194,20 +99,16 @@
       <!-- Reutiliza aquí tu markup de login -->
       <div class="login-card">
         <h1 class="login-title">Iniciar Sesión</h1>
-        <form class="login-form">
+        <form id="loginForm" class="login-form">
           <div class="form-group">
-            <label for="modal-user">Usuario:</label>
-            <input type="text" id="modal-user" name="username" required>
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" name="username" required>
           </div>
           <div class="form-group">
-            <label for="modal-password">Contraseña:</label>
-            <input type="password" id="modal-password" name="password" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
           </div>
           <button type="submit" class="btn btn--primary login-btn">Ingresar</button>
-          <div class="login-links">
-           <!--<a href="#" class="login-link">¿Olvidaste tu contraseña?</a> --> 
-            <!-- <a href="#" class="login-link">Registrarse</a> -->
-          </div>
         </form>
       </div>
     </div>
@@ -215,7 +116,9 @@
 
   <script src="./../../js/modo_oscuro.js"></script>
   <script src="./../../js/menu.js"></script>
-  <script src="./../../js/detalles_product.js"></script>
   <script src="./../../js/login_catalogo.js"></script>
+  <script src="./../../js/sidebar_loader.js"></script>
+  <script src="./../../js/load_products.js"></script>
+
 </body>
 </html>

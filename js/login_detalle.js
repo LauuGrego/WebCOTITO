@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay     = document.getElementById('modalOverlay');
     const btnClose    = document.getElementById('closeModal');
     const btnOpens    = document.querySelectorAll('.open-login-modal');
-    const loginForm   = document.getElementById('loginForm');
+    const loginForm   = document.querySelector('.login-form');
 
     btnOpens.forEach(btn => {
         btn.addEventListener('click', e => {
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const username = document.getElementById('modal-user').value;
+        const password = document.getElementById('modal-password').value;
 
         // Add loading indicator
         const submitButton = loginForm.querySelector('button[type="submit"]');
@@ -37,14 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error en el inicio de sesión');
+                throw new Error(errorData.detail || 'Error en el inicio de sesión');
             }
 
             const data = await response.json();
-            localStorage.setItem('authToken', data.access_token); // Store token in localStorage
-            alert('Inicio de sesión exitoso');
-            modal.classList.remove('show'); // Close modal
-            window.location.href = '/static/editor/agregar_producto.html'; // Ensure correct redirection
+            localStorage.setItem('access_token', data.access_token); // Guardar token en localStorage
+
+            // Verify user details after login
+            const userResponse = await fetch('http://127.0.0.1:8000/usuarios/yo', {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${data.access_token}` }
+            });
+
+            if (userResponse.ok) {
+                alert('Inicio de sesión exitoso');
+                modal.classList.remove('show'); // Cerrar modal
+                window.location.href = '/static/editor/agregar_producto.html'; // Redirect on success
+            } else {
+                throw new Error('Error al validar las credenciales.');
+            }
         } catch (error) {
             console.error('Error:', error);
             alert(error.message || 'Credenciales incorrectas o error en el servidor');

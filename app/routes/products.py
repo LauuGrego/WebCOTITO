@@ -10,6 +10,9 @@ from fastapi.responses import JSONResponse
 import random
 import os
 from pathlib import Path
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+import base64  # Importar para codificar imágenes en Base64
 
 router = APIRouter(prefix="/productos", tags=["Products"])
 
@@ -18,8 +21,16 @@ products_collection = db_client.products
 categories_collection = db_client.categories
 
 # Define the folder to store product images
-IMAGE_FOLDER = Path("products_image")
-IMAGE_FOLDER.mkdir(exist_ok=True)  # Create the folder if it doesn't exist
+IMAGE_FOLDER = Path("static/images/products")
+IMAGE_FOLDER.mkdir(parents=True, exist_ok=True)  # Create the folder if it doesn't exist
+
+# Helper function to save the image to the filesystem
+def save_image_to_directory(image_data: bytes, product_name: str) -> str:
+    sanitized_name = re.sub(r'[^\w\-_\. ]', '_', product_name)  # Sanitize the product name
+    image_path = IMAGE_FOLDER / f"{sanitized_name}.jpg"
+    with open(image_path, "wb") as image_file:
+        image_file.write(image_data)
+    return str(image_path)
 
 # Obtener producto por ID
 def get_product_by_id(product_id: str):
@@ -52,8 +63,9 @@ async def create_product(
     admin: User = Depends(admin_only)
 ):
     # Debugging: Log incoming data
-    print("Product Data:", name, type, size, description, stock, category_name)
-    print("Image Filename:", image.filename)
+    print("Incoming product data:")
+    print(f"Name: {name}, Type: {type}, Size: {size}, Description: {description}, Stock: {stock}, Category: {category_name}")
+    print(f"Image Filename: {image.filename}")
 
     try:
         # Normalize input
@@ -62,8 +74,15 @@ async def create_product(
         category_name = category_name.strip().title()
         size_list = [s.strip().title() for s in size.split(",") if s.strip()]
 
+        # Validate required fields
+        if not name or not type or not size_list or not description or stock is None or not category_name:
+            raise HTTPException(status_code=422, detail="Todos los campos son obligatorios.")
+
         # Read the image as binary data
         image_data = await image.read()
+
+        # Save the image to the filesystem
+        image_path = save_image_to_directory(image_data, name)
 
         # Check if the category exists
         category = categories_collection.find_one({"name": category_name})
@@ -78,16 +97,13 @@ async def create_product(
             "description": description,
             "stock": stock,
             "category_id": str(category["_id"]),
-            "image": image_data,  # Save the image as binary data in the database
+            "image_path": image_path,  # Save the image path in the database
         }
 
         # Insert the product into the database
         result = products_collection.insert_one(product_dict)
         product_dict["_id"] = str(result.inserted_id)
         product_dict["id"] = product_dict.pop("_id")
-
-        # Exclude the image field from the response
-        product_dict.pop("image", None)
 
         return product_dict
 
@@ -130,12 +146,14 @@ async def modify_product(
         category = categories_collection.find_one({"name": category_name})
         if not category:
             raise HTTPException(status_code=404, detail=f"La categoría '{category_name}' no existe.")
-        update_data["category_id"] = str(category["_id"])
+        update_data["category_id"] = str(category["_id"])  # Update with the correct category ID
 
     # Handle image update
     if image:
         image_data = await image.read()
-        update_data["image"] = image_data
+        # Save the image to the filesystem
+        image_path = save_image_to_directory(image_data, update_data.get("name", db_product["name"]))
+        update_data["image_path"] = image_path  # Update the image_path in the database
 
     # Update the product in the database
     products_collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
@@ -177,23 +195,31 @@ async def search_products(name: Optional[str] = None, type: Optional[str] = None
 
     products = list(products_collection.find({"$or": query}))
 
-    if not products:
-        # If no products found, search by individual words
-        query = []
-        if name:
-            for word in name.split():
-                query.append(build_regex_query("name", word))
-        if type:
-            for word in type.split():
-                query.append(build_regex_query("type", word))
-        products = list(products_collection.find({"$or": query}))
-
     for product in products:
         product["_id"] = str(product["_id"])
         product["id"] = product.pop("_id")
+        if "image_path" in product and product["image_path"]:
+            # Ensure the image path is relative to the static directory
+            product["image_path"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+        else:
+            product["image_path"] = "/static/images/default-product.jpg"  # Default image
+        product["price"] = float(product["price"]) if "price" in product and isinstance(product["price"], (int, float)) else None
 
-    shuffled_products = shuffle_products(products)
-    return shuffled_products
+    return products
+
+# Obtener imagen del producto desde el directorio
+@router.get("/imagen/{product_id}")
+async def get_product_image(product_id: str):
+    product = products_collection.find_one({"_id": ObjectId(product_id)})
+    if not product:
+        raise HTTPException(status_code=404, detail="Producto no encontrado.")
+    
+    image_path = Path(product.get("image_path", ""))
+    if not image_path.exists():
+        image_path = Path("static/images/default-product.jpg")  # Imagen por defecto
+
+    return StreamingResponse(image_path.open("rb"), media_type="image/jpeg")
+
 
 # Endpoint para redirigir a WhatsApp con un mensaje predefinido
 @router.get("/whatsapp_redirect")
@@ -248,25 +274,19 @@ async def disable_product(product_id: str, admin: User = Depends(admin_only)):
 
 #Listar Productos
 @router.get("/listar")
-async def list_products():
-    # Se buscan todos los productos, incluyendo el _id
-    products = list(products_collection.find({}))
+async def list_products(search: Optional[str] = None):
+    query = {}
+    if search:
+        query["name"] = {"$regex": re.escape(search), "$options": "i"}  # Case-insensitive search
+
+    products = list(products_collection.find(query))
     
-    # Verificar si se encontraron productos
-    if not products:
-        raise HTTPException(status_code=404, detail="No se encontraron productos.")
-    
-    # Convertir el _id de ObjectId a string antes de devolverlo
     for product in products:
         product["id"] = str(product["_id"])  # Convertir el ObjectId a string
-        product["image"] = "Imagen omitida por razones de tamaño"  # Placeholder para la imagen
+        del product["_id"]  # Eliminar el campo _id
+        # ...existing code for image and price processing...
     
-    # Eliminar el campo _id ya que ya lo hemos convertido a "id"
-    products = [{"id": product["id"], **{key: value for key, value in product.items() if key != "_id"}} for product in products]
-    
-    # Barajar los productos antes de devolverlos
-    shuffled_products = shuffle_products(products)
-    return shuffled_products
+    return products
 
 @router.get("/listar/tipos")
 async def list_product_types():
@@ -298,3 +318,15 @@ async def update_product_sizes():
                 )
 
     return {"message": "Talles numéricos actualizados correctamente para todos los productos."}
+
+@router.get("/detalle/{product_id}")
+async def get_product_details(product_id: str):
+    product = get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Producto no encontrado.")
+    if "image_path" in product and product["image_path"]:
+        product["image"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+    else:
+        product["image"] = "/static/images/default-product.jpg"  # Default image
+    return product
+
