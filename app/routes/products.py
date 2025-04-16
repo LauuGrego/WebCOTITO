@@ -284,8 +284,21 @@ async def list_products(search: Optional[str] = None):
     for product in products:
         product["id"] = str(product["_id"])  # Convertir el ObjectId a string
         del product["_id"]  # Eliminar el campo _id
-        # ...existing code for image and price processing...
-    
+        if "image_path" in product and product["image_path"]:
+            product["image_path"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+        else:
+            product["image_path"] = "/static/images/default-product.jpg"  # Default image
+        
+        # Ensure price is included and properly formatted
+        product["price"] = float(product["price"]) if "price" in product and isinstance(product["price"], (int, float)) else None
+        
+        # Include additional fields if necessary
+        product["description"] = product.get("description", "")
+        product["stock"] = product.get("stock", 0)
+        product["type"] = product.get("type", "")
+        product["size"] = product.get("size", [])
+        product["category_id"] = product.get("category_id", "")
+
     return products
 
 @router.get("/listar/tipos")

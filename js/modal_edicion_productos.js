@@ -30,6 +30,9 @@ function renderProducts(products) {
             <td>${product.type}</td>
             <td>${product.stock}</td>
             <td>
+                <img src="${product.image_path || '/static/images/default-product.jpg'}" alt="Imagen del producto" class="product-preview">
+            </td>
+            <td>
                 <button class="btn-edit" onclick="openEditModal('${product.id}')">
                     <i class="fas fa-edit"></i>
                 </button>
