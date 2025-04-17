@@ -125,7 +125,7 @@ async function openEditModal(productId) {
         form.elements.name.value = product.name;
         form.elements.type.value = product.type;
         form.elements.stock.value = product.stock;
-        form.elements.price.value = product.price.toLocaleString('es-ES', { minimumFractionDigits: 2 }); // Format price
+        form.elements.price.value = product.price; // Preselect the price
         form.elements.description.value = product.description;
 
         // Mostrar la imagen actual del producto
@@ -140,8 +140,9 @@ async function openEditModal(productId) {
         }
 
         // Actualizar los talles seleccionados
+        const productSizes = Array.isArray(product.size) ? product.size.map(size => size.toUpperCase()) : [];
         document.querySelectorAll('input[name="sizes"]').forEach(checkbox => {
-            checkbox.checked = product.size.includes(checkbox.value);
+            checkbox.checked = productSizes.includes(checkbox.value.toUpperCase()); // Mark current sizes as selected
         });
 
         form.dataset.productId = productId; // Guardar el ID del producto en el formulario
@@ -176,6 +177,13 @@ async function saveProductChanges(event) {
     const categorySelect = document.getElementById('category');
     if (categorySelect.value) {
         formData.append('category_name', categorySelect.options[categorySelect.selectedIndex].text);
+    }
+
+    // Collect selected sizes
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes"]:checked'))
+        .map(checkbox => checkbox.value);
+    if (selectedSizes.length > 0) {
+        formData.set('size', selectedSizes.join(',')); // Send sizes as a comma-separated string
     }
 
     try {

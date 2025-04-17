@@ -62,14 +62,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           // Clear existing products and display new ones
           catalogCards.innerHTML = "";
           products.forEach(product => {
+            const imagePath = product.image_path.startsWith("/static/")
+              ? product.image_path
+              : `/static/${product.image_path}`;
+            const formattedPrice = product.price 
+              ? product.price.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+              : "N/A";
             const card = `
               <div class="card">
-                <img src="${product.image_path}" alt="${product.name}" class="card__image">
+                <img src="${imagePath}" alt="${product.name}" class="card__image">
                 <div class="card__info">
                   <h3 class="card__title">${product.name}</h3>
                   <p class="card__description">${product.description}</p>
                   <div class="card__footer">
-                    <span class="card__price">$${product.price || "N/A"}</span>
+                    <span class="card__price">$${formattedPrice}</span>
                     <div class="card__buttons">
                       <button class="ver-detalles-btn" onclick="window.location.href='../../static/detalle/detalle.html?id=${product.id}'">Ver Detalles</button>
                       <a href="https://wa.me/3445417684?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>

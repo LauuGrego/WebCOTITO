@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const categories = await response.json();
         categories.forEach(category => {
             const option = document.createElement("option");
-            option.value = category.name;
+            option.value = category.id; // Use category ID for backend linkage
             option.textContent = category.name;
             categorySelect.appendChild(option);
         });
@@ -39,6 +39,12 @@ document.getElementById("productForm").addEventListener("submit", async (event) 
         .map((checkbox) => checkbox.value)
         .join(",");
     formData.set("size", sizes);
+
+    // Append images to FormData
+    const imageFiles = document.getElementById("image-upload").files;
+    Array.from(imageFiles).forEach((file) => {
+        formData.append("image", file); // Ensure correct key for backend
+    });
 
     // Debugging: Log the FormData being sent
     console.log("FormData being sent:");
@@ -81,7 +87,19 @@ function handleFileSelect(event) {
     const previewContainer = document.getElementById("image-preview");
     previewContainer.innerHTML = ""; // Clear previous previews
 
+    if (!files.length) {
+        const message = document.createElement("p");
+        message.textContent = "No se seleccionaron imágenes.";
+        previewContainer.appendChild(message);
+        return;
+    }
+
     Array.from(files).forEach((file) => {
+        if (!file.type.startsWith("image/")) {
+            console.error(`El archivo ${file.name} no es una imagen.`);
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = document.createElement("img");
@@ -89,6 +107,9 @@ function handleFileSelect(event) {
             img.alt = file.name;
             img.classList.add("preview-image");
             previewContainer.appendChild(img);
+        };
+        reader.onerror = () => {
+            console.error(`Error al leer el archivo ${file.name}.`);
         };
         reader.readAsDataURL(file);
     });

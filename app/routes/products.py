@@ -26,10 +26,10 @@ IMAGE_FOLDER.mkdir(parents=True, exist_ok=True)
 # -----------------
 def save_image_to_directory(image_data: bytes, product_name: str) -> str:
     sanitized_name = re.sub(r'[^\w\-_\. ]', '_', product_name)
-    image_path = IMAGE_FOLDER / f"{sanitized_name}.jpg"
+    image_path = IMAGE_FOLDER / f"{sanitized_name}_{random.randint(1000, 9999)}.jpg"  # Add randomness to avoid overwriting
     with open(image_path, "wb") as image_file:
         image_file.write(image_data)
-    return str(image_path)
+    return f"images/products/{image_path.name}"  # Ensure correct relative path
 
 def get_product_by_id(product_id: str):
     product = products_collection.find_one({"_id": ObjectId(product_id)})
@@ -58,44 +58,55 @@ async def get_product(product_id: str):
 # Agregar productos
 @router.post("/agregar", response_model=Product)
 async def create_product(
-    name: str = Form(...),
-    type: str = Form(...),
-    size: str = Form(...),
-    description: str = Form(...),
-    stock: int = Form(...),
-    category_name: str = Form(...),
-    image: UploadFile = File(...),
-    price: float = Form(...),
+    name: Optional[str] = Form(None),
+    type: Optional[str] = Form(None),
+    size: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    stock: Optional[int] = Form(None),
+    category: Optional[str] = Form(None),  # Receive category ID from the frontend
+    image: Optional[UploadFile] = File(None),
+    price: Optional[float] = Form(None),
     admin: User = Depends(admin_only)
 ):
     try:
-        name = name.strip().title()
-        type = type.strip().title()
-        category_name = category_name.strip().title()
-        size_list = [s.strip().title() for s in size.split(",") if s.strip()]
-        price = round(float(price), 2)
+        # Initialize product data
+        product_dict = {}
 
-        if not name or not type or not size_list or not description or stock is None or not category_name:
-            raise HTTPException(status_code=422, detail="Todos los campos son obligatorios.")
+        if name:
+            product_dict["name"] = name.strip().title()
+        if type:
+            product_dict["type"] = type.strip().title()
+        if size:
+            product_dict["size"] = [s.strip().title() for s in size.split(",") if s.strip()]
+        if description:
+            product_dict["description"] = description.strip()
+        if stock is not None:
+            product_dict["stock"] = stock
+        if category:
+            category_doc = categories_collection.find_one({"_id": ObjectId(category)})
+            if not category_doc:
+                raise HTTPException(status_code=404, detail=f"La categoría con ID '{category}' no existe.")
+            product_dict["category_id"] = category
+        if price is not None:
+            product_dict["price"] = round(float(price), 2)
 
-        image_data = await image.read()
-        image_path = save_image_to_directory(image_data, name)
+        if image:
+            image_data = await image.read()
+            if not image_data:
+                raise HTTPException(status_code=400, detail="El archivo de imagen está vacío.")
+            image_path = save_image_to_directory(image_data, product_dict.get("name", "producto"))
+            product_dict["image_path"] = image_path  # Save the relative path
+        else:
+            # Default image if none is provided
+            product_dict["image_path"] = "images/default-product.jpg"  # Adjusted to match relative path format
 
-        category = categories_collection.find_one({"name": category_name})
-        if not category:
-            raise HTTPException(status_code=404, detail=f"La categoría '{category_name}' no existe.")
+        # Validate required fields
+        required_fields = ["name", "type", "size", "description", "stock", "category_id", "price"]
+        for field in required_fields:
+            if field not in product_dict or not product_dict[field]:
+                raise HTTPException(status_code=422, detail=f"El campo '{field}' es obligatorio.")
 
-        product_dict = {
-            "name": name,
-            "type": type,
-            "size": size_list,
-            "description": description,
-            "stock": stock,
-            "category_id": str(category["_id"]),
-            "image_path": image_path,
-            "price": price,
-        }
-
+        # Insert product into the database
         result = products_collection.insert_one(product_dict)
         product_dict["_id"] = str(result.inserted_id)
         product_dict["id"] = product_dict.pop("_id")
@@ -185,7 +196,7 @@ async def search_products(name: Optional[str] = None, type: Optional[str] = None
         product["_id"] = str(product["_id"])
         product["id"] = product.pop("_id")
         if "image_path" in product and product["image_path"]:
-            product["image_path"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+            product["image_path"] = f"/static/{product['image_path']}"  # Correctly prefix with /static/
         else:
             product["image_path"] = "/static/images/default-product.jpg"
         product["price"] = float(product["price"]) if "price" in product and isinstance(product["price"], (int, float)) else None
@@ -199,7 +210,7 @@ async def get_product_image(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado.")
     
-    image_path = Path(product.get("image_path", ""))
+    image_path = Path("static") / product.get("image_path", "images/default-product.jpg")
     if not image_path.exists():
         image_path = Path("static/images/default-product.jpg")
 
@@ -241,7 +252,7 @@ async def list_products(search: Optional[str] = None):
         product["id"] = str(product["_id"])
         del product["_id"]
         if "image_path" in product and product["image_path"]:
-            product["image_path"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+            product["image_path"] = f"/static/{product['image_path']}"  # Correctly prefix with /static/
         else:
             product["image_path"] = "/static/images/default-product.jpg"
         
@@ -271,9 +282,11 @@ async def get_product_details(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado.")
     if "image_path" in product and product["image_path"]:
-        product["image"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+        product["image"] = f"/static/{product['image_path']}"  # Directly prefix with /static/
     else:
         product["image"] = "/static/images/default-product.jpg"
+    if "price" in product and isinstance(product["price"], (int, float)):
+        product["price"] = "{:,.2f}".format(product["price"]).replace(",", "X").replace(".", ",").replace("X", ".")
     return product
 
 # Buscar por categoría o tipo
@@ -303,7 +316,7 @@ async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Opti
         product["_id"] = str(product["_id"])
         product["id"] = product.pop("_id")
         if "image_path" in product and product["image_path"]:
-            product["image_path"] = f"/static/{Path(product['image_path']).relative_to('static')}"
+            product["image_path"] = f"/static/{product['image_path']}"  # Correctly prefix with /static/
         else:
             product["image_path"] = "/static/images/default-product.jpg"
         product["price"] = float(product["price"]) if "price" in product else None
