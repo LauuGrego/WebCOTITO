@@ -1,6 +1,6 @@
 async function loadProducts(searchQuery = '') {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/productos/listar?search=${encodeURIComponent(searchQuery)}`);
+    const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchQuery)}`);
     if (!response.ok) throw new Error('Error al cargar los productos');
     const products = await response.json();
 

@@ -13,7 +13,7 @@ if (!window.isGestionCategoriasInitialized) {
         // Function to fetch and display categories
         async function loadCategories() {
             try {
-                const response = await fetch("http://127.0.0.1:8000/categorias/listar", {
+                const response = await fetch("https://webcotito.onrender.com/categorias/listar", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -54,7 +54,7 @@ if (!window.isGestionCategoriasInitialized) {
         // Function to delete a category
         async function deleteCategory(categoryName) {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/categorias/eliminar/${encodeURIComponent(categoryName)}`, {
+                const response = await fetch(`https://webcotito.onrender.com/categorias/eliminar/${encodeURIComponent(categoryName)}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ if (!window.isGestionCategoriasInitialized) {
         // Function to add a new category
         async function addCategory(categoryName) {
             try {
-                const response = await fetch("http://127.0.0.1:8000/categorias/agregar", {
+                const response = await fetch("https://webcotito.onrender.com/categorias/agregar", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
