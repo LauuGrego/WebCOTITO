@@ -5,4 +5,5 @@ passlib
 pymongo
 python-multipart
 pydantic[email]
-pillow
+sqlalchemy
+databases
