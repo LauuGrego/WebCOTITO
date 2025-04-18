@@ -213,10 +213,7 @@ body.dark-mode .producto-detalle {
   color: var(--color-texto);
 }
 
-body.dark-mode .producto-info {
-  background-color: var(--color-2);
-  border: 1px solid var(--color-3);
-}
+
 
 body.dark-mode .producto-categoria {
   color: var(--color-texto-claro);
@@ -589,11 +586,6 @@ body.dark-mode .boton-volver:hover {
   body.dark-mode .producto-detalle {
     background-color: var(--color-3);
     color: var(--color-texto);
-  }
-  
-  body.dark-mode .producto-info {
-    background-color: var(--color-2);
-    border: 1px solid var(--color-3);
   }
   
   body.dark-mode .producto-categoria,

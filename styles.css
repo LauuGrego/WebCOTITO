@@ -157,7 +157,6 @@ body.dark-mode .hero__content {
     max-width: 100%;
     position: relative;
     z-index: 2;
-    margin-top: -150px;
 }
 
 body.dark-mode .hero__title {

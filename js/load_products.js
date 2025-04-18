@@ -27,7 +27,7 @@ async function loadProducts(searchQuery = '') {
               <span class="card__price">$${product.price || 'N/A'}</span>
               <div class="card__buttons">
                 <button class="ver-detalles-btn" data-producto-id="${product.id}">Ver detalles</button>
-                <a href="https://wa.me/?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
+                <a href="https://wa.me/3442664940/?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
                   <i class="fab fa-whatsapp"></i> Consultar
                 </a>
               </div>

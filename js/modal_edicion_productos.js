@@ -254,3 +254,31 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     document.getElementById('editForm').addEventListener('submit', saveProductChanges);
 });
+
+// Función para buscar productos desde el backend
+async function searchProducts(searchTerm) {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/productos/listar?search=${encodeURIComponent(searchTerm)}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Error al buscar los productos');
+        }
+        const products = await response.json();
+        renderProducts(products);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Evento para la barra de búsqueda
+document.querySelector('.header__search-input').addEventListener('input', function (event) {
+    const searchTerm = event.target.value;
+    if (searchTerm.trim() === "") {
+        fetchProducts(); // Mostrar todos los productos si el campo está vacío
+    } else {
+        searchProducts(searchTerm); // Buscar productos por el término ingresado
+    }
+});

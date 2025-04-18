@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p class="producto-size">Talles Disponibles: ${product.size}</p>
         <p class="producto-precio">$${product.price ? product.price.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "N/A"}</p>
         <div class="producto-acciones">
-          <a href="https://wa.me/3445417684?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="boton-whatsapp" target="_blank">
+          <a href="https://wa.me/3442664940?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="boton-whatsapp" target="_blank">
             <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
           </a>
           <button class="boton-volver" onclick="window.history.back()">Volver</button>

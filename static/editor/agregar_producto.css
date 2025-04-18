@@ -626,19 +626,19 @@
     .mobile-menu {
       position: fixed;
       top: 0;
-      right: -350px; /* Se oculta fuera del viewport */
+      left: -350px; /* Change from right to left */
       width: 250px;
       height: 100%;
       background-color: var(--color-1);
-      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); /* Adjust shadow direction */
       z-index: 1100;
-      transition: right 0.3s ease;
+      transition: left 0.3s ease; /* Change transition property */
       padding: 1rem;
       display: flex;
     }
     
     .mobile-menu.active {
-      right: 0;
+      left: 0; /* Change from right to left */
     }
     
     .mobile-nav-list {
@@ -703,4 +703,3 @@
       background-color: rgba(0, 0, 0, 0.7);
     }
   }
-  

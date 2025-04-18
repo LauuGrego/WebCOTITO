@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <span class="card__price">$${formattedPrice}</span>
                     <div class="card__buttons">
                       <button class="ver-detalles-btn" onclick="window.location.href='../../static/detalle/detalle.html?id=${product.id}'">Ver Detalles</button>
-                      <a href="https://wa.me/3445417684?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>
+                      <a href="https://wa.me/3442664940/?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>
                     </div>
                   </div>
                 </div>

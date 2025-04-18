@@ -41,10 +41,10 @@
 
       <aside class="mobile-menu">
         <ul class="mobile-nav-list">
-          <li><a href="/static/index.html" class="mobile-nav-link">Inicio</a></li>
-          <li><a href="/static/editor/agregar_producto.html" class="mobile-nav-link">Agregar Producto</a></li>
-          <li><a href="/static/editor/editar_producto.html" class="mobile-nav-link open-login-modal">Editar Productos</a></li>
-          <li><a href="/static/editor/gestion_categorias.html" class="mobile-nav-link open-login-modal">Agregar Categorías</a></li>
+          <li><a href="../../index.html" class="mobile-nav-link">Inicio</a></li>
+          <li><a href="../editor/agregar_producto.html" class="mobile-nav-link">Agregar Producto</a></li>
+          <li><a href="../editor/editar_producto.html" class="mobile-nav-link open-login-modal">Editar Productos</a></li>
+          <li><a href="../editor/gestion_categorias.html" class="mobile-nav-link open-login-modal">Gestionar Categorías</a></li>
         </ul>
       </aside>
 
@@ -107,24 +107,47 @@
           <label>Talles disponibles</label>
           <div class="sizes-grid">
             <label class="size-option">
-              <input type="checkbox" name="sizes" value="XS">
-              <span class="size-label">XS</span>
+              <input type="checkbox" name="sizes" value="3-6 Meses">
+              <span class="size-label">3-6 Meses</span>
             </label>
             <label class="size-option">
-              <input type="checkbox" name="sizes" value="S">
-              <span class="size-label">S</span>
+              <input type="checkbox" name="sizes" value="6-9 Meses">
+              <span class="size-label">6-9 Meses</span>
             </label>
             <label class="size-option">
-              <input type="checkbox" name="sizes" value="M">
-              <span class="size-label">M</span>
+              <input type="checkbox" name="sizes" value="9-12 Meses">
+              <span class="size-label">9-12 Meses</span>
             </label>
             <label class="size-option">
-              <input type="checkbox" name="sizes" value="L">
-              <span class="size-label">L</span>
+              <input type="checkbox" name="sizes" value="12-18 Meses">
+              <span class="size-label">12-18 Meses</span>
             </label>
             <label class="size-option">
-              <input type="checkbox" name="sizes" value="XL">
-              <span class="size-label">XL</span>
+              <input type="checkbox" name="sizes" value="18-24 Meses">
+              <span class="size-label">18-24 Meses</span>
+            </label>
+            </div>
+            <div class="sizes-grid">
+            <label class="size-option">
+              <input type="checkbox" name="sizes" value="2">
+              <span class="size-label">2</span>
+            </label>
+            <label class="size-option">
+              <input type="checkbox" name="sizes" value="4">
+              <span class="size-label">4</span>
+            </label>
+            <label class="size-option">
+              <input type="checkbox" name="sizes" value="6">
+              <span class="size-label">6</span>
+            </label>
+            <label class="size-option">
+              <input type="checkbox" name="sizes" value="8">
+              <span class="size-label">8</span>
+            </label>
+            <label class="size-option">
+              <input type="checkbox" name="sizes" value="10">
+              <span class="size-label">10</span>
+            </label>
           </div>
         </div>
       </div>
@@ -139,5 +162,13 @@
 <script src="../../js/cargar_productos.js"></script>
 <script src="../../js/modo_oscuro.js"></script>
 <script src="../../js/imagenes.js"></script>
+<script>
+  function toggleMenu() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const menuOverlay = document.querySelector('.menu-overlay');
+    mobileMenu.classList.toggle('active');
+    menuOverlay.classList.toggle('active');
+  }
+</script>
 </body>
 </html>
