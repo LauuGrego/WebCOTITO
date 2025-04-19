@@ -36,13 +36,21 @@ document.addEventListener("DOMContentLoaded", async () => {
               <div class="card__footer">
                 <span class="card__price">$${formattedPrice}</span>
                 <div class="card__buttons">
-                  <button class="ver-detalles-btn" onclick="window.location.href='../../static/detalle/detalle.html?id=${product.id}'">Ver Detalles</button>
+                  <button class="ver-detalles-btn" data-product-id="${product.id}">Ver Detalles</button>
                   <a href="https://wa.me/3442664940/?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp">WhatsApp</a>
                 </div>
               </div>
             </div>
           </div>`;
         catalogCards.insertAdjacentHTML('beforeend', card);
+      });
+
+      // Add event listener for "Ver Detalles" buttons
+      document.querySelectorAll('.ver-detalles-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+          const productId = event.target.dataset.productId;
+          window.location.href = `../detalle/detalle.html?id=${productId}`;
+        });
       });
     } catch (error) {
       console.error("Error loading products:", error);
@@ -51,15 +59,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  let debounceTimeout;
+  const debounce = (func, delay) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(func, delay);
+  };
+
+  const searchInput = document.querySelector('.header__search-input');
+  searchInput.addEventListener('input', () => {
+    debounce(() => {
+      const searchQuery = searchInput.value.trim();
+      currentPage = 1;
+      hasMoreProducts = true;
+      catalogCards.innerHTML = ""; // Clear catalog for new search
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("search", searchQuery);
+      loadProductsWithPagination(params.toString(), currentPage);
+    }, 300); // 300ms debounce delay
+  });
+
   window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
+    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 100;
+    if (window.scrollY >= scrollThreshold && !isLoading) {
       currentPage++;
       const params = new URLSearchParams();
       const activeCategory = document.querySelector(".sidebar__link[data-category].active");
       const activeType = document.querySelector(".sidebar__link[data-type].active");
+      const searchQuery = searchInput.value.trim();
 
       if (activeCategory) params.append("category", activeCategory.dataset.category);
       if (activeType) params.append("type", activeType.dataset.type);
+      if (searchQuery) params.append("search", searchQuery);
 
       loadProductsWithPagination(params.toString(), currentPage);
     }

@@ -3,6 +3,14 @@ const productsPerPage = 10;
 let isLoading = false;
 let hasMoreProducts = true;
 
+const debounce = (func, delay) => {
+  let debounceTimeout;
+  return (...args) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => func(...args), delay);
+  };
+};
+
 // Función para cargar productos con paginación
 async function loadProducts(searchQuery = '', page = 1) {
     if (isLoading || !hasMoreProducts) return;
@@ -40,7 +48,7 @@ async function loadProducts(searchQuery = '', page = 1) {
                   <div class="card__footer">
                     <span class="card__price">$${product.price || 'N/A'}</span>
                     <div class="card__buttons">
-                      <button class="ver-detalles-btn" data-producto-id="${product.id}">Ver detalles</button>
+                      <button class="ver-detalles-btn" data-product-id="${product.id}">Ver detalles</button>
                       <a href="https://wa.me/3442664940/?text=¡Hola! Quiero saber más info acerca de ${product.name}." class="card__whatsapp" target="_blank" aria-label="Consultar por WhatsApp">
                         <i class="fab fa-whatsapp"></i> Consultar
                       </a>
@@ -51,11 +59,11 @@ async function loadProducts(searchQuery = '', page = 1) {
             catalogCards.insertAdjacentHTML('beforeend', productCard);
         });
 
-        // Add event listener for "Ver detalles" buttons
+        // Add event listener for "Ver Detalles" buttons
         document.querySelectorAll('.ver-detalles-btn').forEach(button => {
             button.addEventListener('click', (event) => {
-                const productId = event.target.dataset.productoId;
-                window.location.href = `../../static/detalle/detalle.html?id=${productId}`;
+                const productId = event.target.dataset.productId;
+                window.location.href = `../detalle/detalle.html?id=${productId}`;
             });
         });
     } catch (error) {
@@ -67,11 +75,11 @@ async function loadProducts(searchQuery = '', page = 1) {
 
 // Detectar scroll para cargar más productos
 window.addEventListener("scroll", () => {
-    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 50; // Adjusted threshold
+    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 100; // Adjusted threshold
     if (window.scrollY >= scrollThreshold && !isLoading) {
         currentPage++;
         const searchInput = document.querySelector('.header__search-input');
-        const searchQuery = searchInput ? searchInput.value : '';
+        const searchQuery = searchInput ? searchInput.value.trim() : '';
         loadProducts(searchQuery, currentPage);
     }
 });
@@ -80,10 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.querySelector('.header__search-input');
   loadProducts();
 
-  searchInput.addEventListener('input', () => {
-    const searchQuery = searchInput.value;
+  searchInput.addEventListener('input', debounce(() => {
+    const searchQuery = searchInput.value.trim();
     currentPage = 1; // Reset current page when a new search is performed
     hasMoreProducts = true; // Reset hasMoreProducts when a new search is performed
     loadProducts(searchQuery, currentPage);
-  });
+  }, 300)); // 300ms debounce delay
 });

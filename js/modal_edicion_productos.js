@@ -46,35 +46,36 @@ function renderPagination(totalPages, currentPage) {
     }
 }
 
-// Función para renderizar la tabla de productos
+// Función para renderizar la tabla de productos (optimizada)
 function renderProducts(products, append = false) {
     const tbody = document.querySelector('.products-table tbody');
     if (!append) {
         tbody.innerHTML = ""; // Limpiar contenido previo si no se está agregando
     }
 
-    products.forEach(product => {
+    const rows = products.map(product => {
         const imageUrl = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${product.name}</td>
-            <td>${product.category_name || 'Sin categoría'}</td>
-            <td>${product.type}</td>
-            <td>${product.stock}</td>
-            <td>
-                <img src="${imageUrl}" alt="Imagen del producto" class="product-preview">
-            </td>
-            <td>
-                <button class="btn-edit" onclick="openEditModal('${product.id}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-delete" onclick="deleteProduct('${product.id}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
+        return `
+            <tr>
+                <td>${product.name}</td>
+                <td>${product.category_name || 'Sin categoría'}</td>
+                <td>${product.type}</td>
+                <td>${product.stock}</td>
+                <td>
+                    <img src="${imageUrl}" alt="Imagen del producto" class="product-preview">
+                </td>
+                <td>
+                    <button class="btn-edit" onclick="openEditModal('${product.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-delete" onclick="deleteProduct('${product.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
         `;
-        tbody.appendChild(row);
-    });
+    }).join('');
+    tbody.insertAdjacentHTML('beforeend', rows);
 }
 
 // Función para obtener el nombre de la categoría por ID
@@ -322,10 +323,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('editForm').addEventListener('submit', saveProductChanges);
 });
 
-// Función para buscar productos desde el backend
+// Función para buscar productos (optimizada)
 async function searchProducts(searchTerm) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchTerm)}`, {
+        const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchTerm)}&limit=${productsPerPage}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -333,22 +334,31 @@ async function searchProducts(searchTerm) {
         if (!response.ok) {
             throw new Error('Error al buscar los productos');
         }
-        const products = await response.json();
+        const { products } = await response.json();
         renderProducts(products);
     } catch (error) {
         console.error('Error:', error);
     }
 }
 
-// Evento para la barra de búsqueda
-document.querySelector('.header__search-input').addEventListener('input', function (event) {
-    const searchTerm = event.target.value;
-    if (searchTerm.trim() === "") {
+// Evento para la barra de búsqueda (optimizado)
+document.querySelector('.header__search-input').addEventListener('input', debounce(function (event) {
+    const searchTerm = event.target.value.trim();
+    if (searchTerm === "") {
         fetchProducts(); // Mostrar todos los productos si el campo está vacío
     } else {
         searchProducts(searchTerm); // Buscar productos por el término ingresado
     }
-});
+}, 300));
+
+// Función de debounce para limitar la frecuencia de ejecución
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
 
 // Agregar evento de scroll infinito
 window.addEventListener('scroll', () => {
