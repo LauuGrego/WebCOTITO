@@ -61,19 +61,12 @@ document.getElementById("productForm").addEventListener("submit", async (event) 
     formData.set("size", sizes);
 
     try {
-        // Subir imágenes a Cloudinary y obtener las URLs
-        const imageFiles = document.getElementById("image-upload").files;
-        const imageUrls = [];
-
-        for (const file of imageFiles) {
-            const imageUrl = await uploadImageToCloudinary(file);
-            imageUrls.push(imageUrl);
+        // Subir imagen a Cloudinary y obtener la URL
+        const imageInput = document.getElementById("image-upload");
+        if (imageInput.files.length > 0) {
+            const imageUrl = await uploadImageToCloudinary(imageInput.files[0]);
+            formData.set("image_url", imageUrl); // Enviar solo la URL al backend
         }
-
-        // Agregar las URLs al formData como un campo nuevo
-        imageUrls.forEach((url) => {
-            formData.append("images", url); // ajustá el nombre si tu backend espera otro
-        });
 
         // Log de depuración
         console.log("FormData being sent:");
