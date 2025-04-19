@@ -1,7 +1,7 @@
 // Función para obtener productos desde el backend
 async function fetchProducts() {
     try {
-        const response = await fetch('https://webcotito.onrender.com/productos/listar', {
+        const response = await fetch('http://127.0.0.1:8000/productos/listar', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -22,6 +22,7 @@ function renderProducts(products) {
     tbody.innerHTML = ""; // Limpiar contenido previo
 
     products.forEach(product => {
+        const imageUrl = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${product.name}</td>
@@ -29,7 +30,7 @@ function renderProducts(products) {
             <td>${product.type}</td>
             <td>${product.stock}</td>
             <td>
-                <img src="${product.image_path || '/static/images/default-product.jpg'}" alt="Imagen del producto" class="product-preview">
+                <img src="${imageUrl}" alt="Imagen del producto" class="product-preview">
             </td>
             <td>
                 <button class="btn-edit" onclick="openEditModal('${product.id}')">
@@ -48,7 +49,7 @@ function renderProducts(products) {
 async function fetchCategoryName(categoryId) {
     try {
         console.log(`Fetching category name for ID: ${categoryId}`);
-        const response = await fetch(`https://webcotito.onrender.com/categorias/buscar-por-id/${categoryId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/categorias/buscar-por-id/${categoryId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -72,7 +73,7 @@ async function fetchCategoryName(categoryId) {
 // Función para obtener y listar las categorías en el select del modal
 async function populateCategorySelect(selectedCategoryId = null) {
     try {
-        const response = await fetch('https://webcotito.onrender.com/categorias/listar-public', {
+        const response = await fetch('http://127.0.0.1:8000/categorias/listar-public', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -104,7 +105,7 @@ async function populateCategorySelect(selectedCategoryId = null) {
 // Abrir modal para editar y rellenar el formulario con los datos del producto seleccionado
 async function openEditModal(productId) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/obtener_por_id/${productId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/productos/obtener_por_id/${productId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -131,9 +132,9 @@ async function openEditModal(productId) {
         // Mostrar la imagen actual del producto
         const imagePreview = document.getElementById('imagePreview');
         imagePreview.innerHTML = ""; // Limpiar previsualización previa
-        if (product.image) {
+        if (product.image_path) {
             const img = document.createElement('img');
-            img.src = product.image;
+            img.src = product.image_path;
             img.alt = "Imagen actual del producto";
             img.classList.add('preview-image');
             imagePreview.appendChild(img);
@@ -157,6 +158,28 @@ function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
 }
 
+// Configuración de Cloudinary
+const CLOUD_NAME = "dotxvd5dc"; // ← reemplazar con tu Cloud Name
+const UPLOAD_PRESET = "cotito_images"; // ← reemplazar con tu Upload Preset
+
+async function uploadImageToCloudinary(file) {
+    const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+    });
+
+    if (!response.ok) throw new Error("Error al subir imagen a Cloudinary");
+
+    const data = await response.json();
+    return data.secure_url;
+}
+
 // Guardar cambios del producto (incluyendo categoría)
 async function saveProductChanges(event) {
     event.preventDefault();
@@ -168,9 +191,18 @@ async function saveProductChanges(event) {
     if (priceInput) {
         formData.set('price', parseFloat(priceInput).toFixed(2));
     }
+
+    // Subir imagen a Cloudinary si se seleccionó una nueva
     const imageInput = document.getElementById('productImageInput');
     if (imageInput.files.length > 0) {
-        formData.append('image', imageInput.files[0]);
+        try {
+            const imageUrl = await uploadImageToCloudinary(imageInput.files[0]);
+            formData.set('image_url', imageUrl); // Enviar solo la URL al backend
+        } catch (error) {
+            console.error("Error al subir la imagen:", error);
+            alert("Ocurrió un error al subir la imagen.");
+            return;
+        }
     }
 
     // Add the selected category ID to the form data
@@ -187,7 +219,7 @@ async function saveProductChanges(event) {
     }
 
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/actualizar/${productId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/productos/actualizar/${productId}`, {
             method: 'PUT',
             body: formData,
             headers: {
@@ -208,7 +240,7 @@ async function saveProductChanges(event) {
 // Deshabilitar producto
 async function disableProduct(productId) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/deshabilitar/${productId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/productos/deshabilitar/${productId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -258,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para buscar productos desde el backend
 async function searchProducts(searchTerm) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchTerm)}`, {
+        const response = await fetch(`http://127.0.0.1:8000/productos/listar?search=${encodeURIComponent(searchTerm)}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }

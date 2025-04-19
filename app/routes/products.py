@@ -9,7 +9,7 @@ import re
 from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
 import random
 from pathlib import Path
-
+from cloudinary.uploader import upload as cloudinary_upload
 
 # Router setup
 router = APIRouter(prefix="/productos", tags=["Products"])
@@ -18,18 +18,8 @@ router = APIRouter(prefix="/productos", tags=["Products"])
 products_collection = db_client.products
 categories_collection = db_client.categories
 
-# Constants
-IMAGE_FOLDER = Path("static/images/products")
-IMAGE_FOLDER.mkdir(parents=True, exist_ok=True)
-
 # Helper functions
 # -----------------
-def save_image_to_directory(image_data: bytes, product_name: str) -> str:
-    sanitized_name = re.sub(r'[^\w\-_\. ]', '_', product_name)
-    image_path = IMAGE_FOLDER / f"{sanitized_name}_{random.randint(1000, 9999)}.jpg"  # Add randomness to avoid overwriting
-    with open(image_path, "wb") as image_file:
-        image_file.write(image_data)
-    return f"images/products/{image_path.name}"  # Ensure correct relative path
 
 def get_product_by_id(product_id: str):
     product = products_collection.find_one({"_id": ObjectId(product_id)})
@@ -64,7 +54,7 @@ async def create_product(
     description: Optional[str] = Form(None),
     stock: Optional[int] = Form(None),
     category: Optional[str] = Form(None),  # Receive category ID from the frontend
-    image: Optional[UploadFile] = File(None),
+    image_url: Optional[str] = Form(None),  # Receive image URL from the frontend
     price: Optional[float] = Form(None),
     admin: User = Depends(admin_only)
 ):
@@ -90,15 +80,11 @@ async def create_product(
         if price is not None:
             product_dict["price"] = round(float(price), 2)
 
-        if image:
-            image_data = await image.read()
-            if not image_data:
-                raise HTTPException(status_code=400, detail="El archivo de imagen está vacío.")
-            image_path = save_image_to_directory(image_data, product_dict.get("name", "producto"))
-            product_dict["image_path"] = image_path  # Save the relative path
+        if image_url:
+            product_dict["image_path"] = image_url  # Save the image URL
         else:
             # Default image if none is provided
-            product_dict["image_path"] = "images/default-product.jpg"  # Adjusted to match relative path format
+            product_dict["image_path"] = "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg"
 
         # Validate required fields
         required_fields = ["name", "type", "size", "description", "stock", "category_id", "price"]
@@ -126,7 +112,7 @@ async def modify_product(
     description: Optional[str] = Form(None),
     stock: Optional[int] = Form(None),
     category_name: Optional[str] = Form(None),
-    image: Optional[UploadFile] = File(None),
+    image_url: Optional[str] = Form(None),  # Receive image URL from the frontend
     price: Optional[float] = Form(None),
     admin: User = Depends(admin_only)
 ):
@@ -155,10 +141,8 @@ async def modify_product(
     if price is not None:
         update_data["price"] = round(float(price), 2)
 
-    if image:
-        image_data = await image.read()
-        image_path = save_image_to_directory(image_data, update_data.get("name", db_product["name"]))
-        update_data["image_path"] = image_path
+    if image_url:
+        update_data["image_path"] = image_url  # Update the image URL
 
     products_collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
 
@@ -210,11 +194,8 @@ async def get_product_image(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Producto no encontrado.")
     
-    image_path = Path("static") / product.get("image_path", "images/default-product.jpg")
-    if not image_path.exists():
-        image_path = Path("static/images/default-product.jpg")
-
-    return StreamingResponse(image_path.open("rb"), media_type="image/jpeg")
+    image_url = product.get("image_path", "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg")
+    return JSONResponse(content={"image_url": image_url})
 
 # Deshabilitar productos
 @router.put("/deshabilitar/{product_id}", response_model=Product)
@@ -251,10 +232,8 @@ async def list_products(search: Optional[str] = None):
     for product in products:
         product["id"] = str(product["_id"])
         del product["_id"]
-        if "image_path" in product and product["image_path"]:
-            product["image_path"] = f"/static/{product['image_path']}"  # Correctly prefix with /static/
-        else:
-            product["image_path"] = "/static/images/default-product.jpg"
+        if "image_path" not in product or not product["image_path"]:
+            product["image_path"] = "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg"
         
         if "price" in product and isinstance(product["price"], (int, float)):
             product["price"] = "{:,.2f}".format(product["price"]).replace(",", "X").replace(".", ",").replace("X", ".")
@@ -315,10 +294,8 @@ async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Opti
     for product in products:
         product["_id"] = str(product["_id"])
         product["id"] = product.pop("_id")
-        if "image_path" in product and product["image_path"]:
-            product["image_path"] = f"/static/{product['image_path']}"  # Correctly prefix with /static/
-        else:
-            product["image_path"] = "/static/images/default-product.jpg"
+        if "image_path" not in product or not product["image_path"]:
+            product["image_path"] = "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg"
         product["price"] = float(product["price"]) if "price" in product else None
 
     return products

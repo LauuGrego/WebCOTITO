@@ -1,6 +1,6 @@
 async function loadProducts(searchQuery = '') {
   try {
-    const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchQuery)}`);
+    const response = await fetch(`http://127.0.0.1:8000/productos/listar?search=${encodeURIComponent(searchQuery)}`);
     if (!response.ok) throw new Error('Error al cargar los productos');
     const products = await response.json();
 
@@ -13,13 +13,11 @@ async function loadProducts(searchQuery = '') {
     }
 
     products.forEach(product => {
-      const productImage = product.image_path
-        ? product.image_path
-        : '/static/images/default-product.jpg'; // Default image fallback
+      const productImage = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
 
       const productCard = `
         <div class="card">
-          <img src="${productImage}" alt="${product.name}" class="card__image" />
+         <img src="${productImage}" alt="${product.name}" class="card__image" />
           <div class="card__info">
             <h2 class="card__title">${product.name}</h2>
             <p class="card__description">${product.description}</p>

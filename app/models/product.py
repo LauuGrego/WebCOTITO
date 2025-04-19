@@ -10,7 +10,7 @@ class ProductBase(BaseModel):
     description: Optional[str] = None
     stock: int
     image: Optional[bytes] = None  # Store image as binary data
-    image_path: Optional[str] = None  # Add image_path to store the image file path
+    image_path: Optional[str] = None  # Store Cloudinary URL
 
     class Config:
         from_attributes = True
@@ -36,7 +36,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     stock: Optional[int] = None
     image: Optional[bytes] = None  # Cambiado a bytes
-    image_path: Optional[str] = None  # Add image_path for updates
+    image_path: Optional[str] = None  # Update Cloudinary URL
     category_name: Optional[str] = None  # Opción de categoría si se quiere actualizar
 
     class Config:

@@ -9,12 +9,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const response = await fetch(`https://webcotito.onrender.com/productos/detalle/${productId}`);
+    const response = await fetch(`http://127.0.0.1:8000/productos/detalle/${productId}`);
     if (!response.ok) throw new Error("Error al obtener los detalles del producto.");
     const product = await response.json();
 
+    const productImage = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
+
     const productHTML = `
-      <img src="${product.image}" alt="${product.name}" class="producto-imagen" />
+      <img src="${productImage}" alt="${product.name}" class="producto-imagen" />
       <div class="producto-info">
         <span class="producto-categoria">${product.type}</span>
         <h1 class="producto-titulo">${product.name}</h1>

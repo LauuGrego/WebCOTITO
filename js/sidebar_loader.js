@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     // Fetch categories
-    const categoriesResponse = await fetch("https://webcotito.onrender.com/categorias/listar-public");
+    const categoriesResponse = await fetch("http://127.0.0.1:8000/categorias/listar-public");
     if (!categoriesResponse.ok) {
       throw new Error(`Error fetching categories: ${categoriesResponse.statusText}`);
     }
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Fetch product types
-    const typesResponse = await fetch("https://webcotito.onrender.com/productos/listar/tipos");
+    const typesResponse = await fetch("http://127.0.0.1:8000/productos/listar/tipos");
     if (!typesResponse.ok) {
       throw new Error(`Error fetching product types: ${typesResponse.statusText}`);
     }
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (type) params.append("type", type);
 
         try {
-          const response = await fetch(`https://webcotito.onrender.com/productos/buscar_por_categoria_o_tipo?${params.toString()}`);
+          const response = await fetch(`http://127.0.0.1:8000/productos/buscar_por_categoria_o_tipo?${params.toString()}`);
           if (!response.ok) {
             throw new Error(`Error fetching products: ${response.statusText}`);
           }
@@ -62,9 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           // Clear existing products and display new ones
           catalogCards.innerHTML = "";
           products.forEach(product => {
-            const imagePath = product.image_path.startsWith("/static/")
-              ? product.image_path
-              : `/static/${product.image_path}`;
+            const imagePath = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
             const formattedPrice = product.price 
               ? product.price.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
               : "N/A";
