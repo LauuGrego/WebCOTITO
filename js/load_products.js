@@ -67,7 +67,8 @@ async function loadProducts(searchQuery = '', page = 1) {
 
 // Detectar scroll para cargar más productos
 window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
+    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 50; // Adjusted threshold
+    if (window.scrollY >= scrollThreshold && !isLoading) {
         currentPage++;
         const searchInput = document.querySelector('.header__search-input');
         const searchQuery = searchInput ? searchInput.value : '';

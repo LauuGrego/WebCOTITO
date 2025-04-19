@@ -725,29 +725,53 @@ body.dark-mode .upload-area:hover {
     }
 
     .products-table tr {
-        display: block;
+        display: flex;
+        flex-direction: column;
         margin-bottom: 1rem;
         background-color: var(--color-2);
         border-radius: 12px;
-        padding: 1rem;
+        padding: 0.8rem;
         text-align: center;
-        width: 126%;
+        width: 100%;
     }
 
     .products-table td {
         display: flex;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
-        padding: 0.6rem 0;
+        justify-content: center;
+        padding: 0.4rem 0;
         border-bottom: 1px solid var(--color-3);
-        gap: 1rem;
+        font-size: 0.9rem;
+        text-align: center;
     }
 
     .products-table td::before {
         content: attr(data-label);
         font-weight: 600;
         color: var(--color-8);
-        margin-right: 1rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .products-table td span {
+        text-align: center;
+    }
+
+    .products-table td:last-child {
+        border-bottom: none;
+    }
+
+    .products-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--color-8);
+        flex: 1;
+        text-align: left;
+    }
+
+    .products-table td span {
+        flex: 2;
+        text-align: center;
     }
 
     .actions {

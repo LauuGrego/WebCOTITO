@@ -533,6 +533,7 @@ body {
   flex-direction: column;
   gap: 0.75rem;
   align-items: center;
+  text-align: center; /* Centrar contenido de los <li> */
 }
 
 .sidebar__link {
@@ -542,6 +543,9 @@ body {
   transition: color 0.3s ease, background-color 0.3s ease;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  text-align: center; /* Centrar texto */
+  white-space: normal; /* Permitir que el texto ocupe varias líneas */
+  word-wrap: break-word; /* Ajustar palabras largas */
 }
 .sidebar__link:hover {
   color: var(--color-principal-light);
@@ -1213,5 +1217,15 @@ body {
     width: 100%;
     white-space: nowrap;
     justify-content: center;
+  }
+
+  .sidebar__list {
+    text-align: center; /* Centrar contenido en vista móvil */
+  }
+
+  .sidebar__link {
+    text-align: center; /* Centrar texto en vista móvil */
+    white-space: normal; /* Permitir varias líneas en vista móvil */
+    word-wrap: break-word; /* Ajustar palabras largas en vista móvil */
   }
 }
