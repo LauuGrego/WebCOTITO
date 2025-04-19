@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
 import random
 from pathlib import Path
 from cloudinary.uploader import upload as cloudinary_upload
+from math import ceil
 
 # Router setup
 router = APIRouter(prefix="/productos", tags=["Products"])
@@ -197,37 +198,31 @@ async def get_product_image(product_id: str):
     image_url = product.get("image_path", "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg")
     return JSONResponse(content={"image_url": image_url})
 
-# Deshabilitar productos
-@router.put("/deshabilitar/{product_id}", response_model=Product)
-async def disable_product(product_id: str, admin: User = Depends(admin_only)):
+# Eliminar productos
+@router.delete("/eliminar/{product_id}", response_model=dict)
+async def delete_product(product_id: str, admin: User = Depends(admin_only)):
     db_product = get_product_by_id(product_id)
     if not db_product:
         raise HTTPException(status_code=404, detail="Producto no encontrado.")
     
-    updated_product = products_collection.find_one_and_update(
-        {"_id": ObjectId(product_id)},
-        {"$set": {"stock": 0, "size": []}},
-        return_document=True
-    )
-    
-    if updated_product:
-        updated_product["_id"] = str(updated_product["_id"])
-        updated_product["id"] = updated_product.pop("_id")
-        
-        return {key: updated_product[key] for key in updated_product if key != "_id"}
+    result = products_collection.delete_one({"_id": ObjectId(product_id)})
+    if result.deleted_count == 1:
+        return {"message": "Producto eliminado con éxito."}
     else:
-        raise HTTPException(status_code=500, detail="Error al deshabilitar el producto.")
-    
-    return ("producto deshabilidato con exito")
+        raise HTTPException(status_code=500, detail="Error al eliminar el producto.")
 
 # Listar productos
 @router.get("/listar")
-async def list_products(search: Optional[str] = None):
+async def list_products(search: Optional[str] = None, page: int = 1, limit: int = 10):
     query = {}
     if search:
         query["name"] = {"$regex": re.escape(search), "$options": "i"}
 
-    products = list(products_collection.find(query))
+    total_products = products_collection.count_documents(query)
+    total_pages = ceil(total_products / limit)
+    skip = (page - 1) * limit
+
+    products = list(products_collection.find(query).skip(skip).limit(limit))
     
     for product in products:
         product["id"] = str(product["_id"])
@@ -246,7 +241,7 @@ async def list_products(search: Optional[str] = None):
         category = categories_collection.find_one({"_id": ObjectId(product["category_id"])})
         product["category_name"] = category["name"] if category else "Sin categoría"
 
-    return products
+    return {"products": products, "totalPages": total_pages}
 
 @router.get("/listar/tipos")
 async def list_product_types():
@@ -270,7 +265,7 @@ async def get_product_details(product_id: str):
 
 # Buscar por categoría o tipo
 @router.get("/buscar_por_categoria_o_tipo")
-async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Optional[str] = None):
+async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Optional[str] = None, page: int = 1, limit: int = 10):
     if not category and not type:
         raise HTTPException(
             status_code=400,
@@ -289,7 +284,11 @@ async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Opti
     if type:
         query["type"] = {"$regex": f"^{re.escape(type.strip().title())}$", "$options": "i"}
 
-    products = list(products_collection.find(query))
+    total_products = products_collection.count_documents(query)
+    total_pages = ceil(total_products / limit)
+    skip = (page - 1) * limit
+
+    products = list(products_collection.find(query).skip(skip).limit(limit))
 
     for product in products:
         product["_id"] = str(product["_id"])
@@ -298,5 +297,5 @@ async def buscar_por_categoria_o_tipo(category: Optional[str] = None, type: Opti
             product["image_path"] = "https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg"
         product["price"] = float(product["price"]) if "price" in product else None
 
-    return products
+    return {"products": products, "totalPages": total_pages}
 

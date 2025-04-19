@@ -1,7 +1,15 @@
 // Función para obtener productos desde el backend
-async function fetchProducts() {
+let currentPage = 1;
+const productsPerPage = 10;
+let isLoading = false; // Evitar múltiples solicitudes simultáneas
+
+// Función para obtener productos con paginación
+async function fetchProducts(page = 1, append = false) {
     try {
-        const response = await fetch('https://webcotito.onrender.com/productos/listar', {
+        if (isLoading) return; // Evitar múltiples solicitudes
+        isLoading = true;
+
+        const response = await fetch(`https://webcotito.onrender.com/productos/listar?page=${page}&limit=${productsPerPage}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -9,17 +17,41 @@ async function fetchProducts() {
         if (!response.ok) {
             throw new Error('Error al obtener los productos');
         }
-        const products = await response.json();
-        renderProducts(products);
+        const { products, totalPages } = await response.json();
+        renderProducts(products, append);
+        renderPagination(totalPages, page);
+        isLoading = false;
     } catch (error) {
         console.error('Error:', error);
+        isLoading = false;
+    }
+}
+
+// Función para renderizar la paginación
+function renderPagination(totalPages, currentPage) {
+    const paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = ""; // Limpiar paginación previa
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.add('pagination-button');
+        if (i === currentPage) {
+            button.classList.add('active');
+        }
+        button.addEventListener('click', () => {
+            fetchProducts(i);
+        });
+        paginationContainer.appendChild(button);
     }
 }
 
 // Función para renderizar la tabla de productos
-function renderProducts(products) {
+function renderProducts(products, append = false) {
     const tbody = document.querySelector('.products-table tbody');
-    tbody.innerHTML = ""; // Limpiar contenido previo
+    if (!append) {
+        tbody.innerHTML = ""; // Limpiar contenido previo si no se está agregando
+    }
 
     products.forEach(product => {
         const imageUrl = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
@@ -36,7 +68,7 @@ function renderProducts(products) {
                 <button class="btn-edit" onclick="openEditModal('${product.id}')">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn-delete" onclick="disableProduct('${product.id}')">
+                <button class="btn-delete" onclick="deleteProduct('${product.id}')">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -237,19 +269,22 @@ async function saveProductChanges(event) {
     }
 }
 
-// Deshabilitar producto
-async function disableProduct(productId) {
+// Eliminar producto con confirmación
+async function deleteProduct(productId) {
+    const confirmation = confirm("¿Está seguro que desea eliminar este producto?");
+    if (!confirmation) return; // Cancelar si el usuario no confirma
+
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/deshabilitar/${productId}`, {
-            method: 'PUT',
+        const response = await fetch(`https://webcotito.onrender.com/productos/eliminar/${productId}`, {
+            method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
         });
         if (!response.ok) {
-            throw new Error('Error al deshabilitar el producto');
+            throw new Error('Error al eliminar el producto');
         }
-        alert('Producto deshabilitado con éxito');
+        alert('Producto eliminado con éxito');
         fetchProducts(); // Actualizar la lista de productos
     } catch (error) {
         console.error('Error:', error);
@@ -283,7 +318,7 @@ window.onclick = function(event) {
 
 // Al cargar el DOM, obtener y renderizar los productos
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProducts();
+    fetchProducts(currentPage);
     document.getElementById('editForm').addEventListener('submit', saveProductChanges);
 });
 
@@ -312,5 +347,13 @@ document.querySelector('.header__search-input').addEventListener('input', functi
         fetchProducts(); // Mostrar todos los productos si el campo está vacío
     } else {
         searchProducts(searchTerm); // Buscar productos por el término ingresado
+    }
+});
+
+// Agregar evento de scroll infinito
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
+        currentPage++;
+        fetchProducts(currentPage, true); // Cargar más productos y agregarlos
     }
 });

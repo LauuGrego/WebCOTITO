@@ -609,14 +609,14 @@ body {
 }
 
 .card__description {
-  font-size: 0.9rem;
-  color: var(--color-5);
-  margin-bottom: 1rem;
-  display: block; /* Ensure full visibility */
-  overflow-wrap: break-word; /* Prevent text from overflowing */
-  word-wrap: break-word; /* Compatibility for older browsers */
-  word-break: break-word; /* Break long words if necessary */
-  white-space: normal; /* Allow text to wrap to the next line */
+  font-size: 0.75rem;
+  color: var(--color-7);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: inherit;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  overflow: hidden;
+  margin: 0.5rem 0;
 }
 
 /* Añade estos estilos para mejorar los botones de detalles */
