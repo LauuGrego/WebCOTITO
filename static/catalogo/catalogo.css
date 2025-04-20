@@ -1,7 +1,31 @@
 /***********************************************/
 /* 1. Importación de fuentes                    */
 /***********************************************/
-@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Fredoka+One&display=swap');
+
+/* Self-hosted fonts */
+@font-face {
+  font-family: 'Balsamiq Sans';
+  src: url('../../fonts/BalsamiqSans-Regular.woff2') format('woff2'),
+       url('../../fonts/BalsamiqSans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Balsamiq Sans';
+  src: url('../../fonts/BalsamiqSans-Bold.woff2') format('woff2'),
+       url('../../fonts/BalsamiqSans-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fredoka One';
+  src: url('../../fonts/FredokaOne-Regular.woff2') format('woff2'),
+       url('../../fonts/FredokaOne-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
 
 /***********************************************/
 /* 2. Variables y modo oscuro                  */
@@ -374,7 +398,7 @@ html, body {
 }
 
 body {
-  font-family: "Montserrat", sans-serif;
+  font-family: 'Balsamiq Sans', sans-serif;
   background-color: var(--color-1);
   color: var(--color-11);
   line-height: 1.6;
@@ -1156,7 +1180,7 @@ body {
   /* Imagen fija a la izquierda */
   .card__image {
     width: 120px;        /* ancho fijo */
-    height: 280px;       /* alto fijo */
+    height: 365px;       /* alto fijo */
     object-fit: cover;
     flex-shrink: 0;
   }
@@ -1227,5 +1251,27 @@ body {
     text-align: center; /* Centrar texto en vista móvil */
     white-space: normal; /* Permitir varias líneas en vista móvil */
     word-wrap: break-word; /* Ajustar palabras largas en vista móvil */
+  }
+}
+
+.loading-spinner {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem auto;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--color-principal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

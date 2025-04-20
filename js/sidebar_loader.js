@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const sidebarCategories = document.getElementById("sidebarCategories");
   const catalogCards = document.getElementById("catalogCards");
+  const loadingSpinner = document.createElement("div");
+  loadingSpinner.className = "loading-spinner";
+  loadingSpinner.innerHTML = `<div class="spinner"></div>`;
+  catalogCards.insertAdjacentElement("afterend", loadingSpinner); // Place spinner after catalog cards
 
   let currentPage = 1;
   const productsPerPage = 10;
@@ -10,9 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadProductsWithPagination(params = "", page = 1) {
     if (isLoading || !hasMoreProducts) return;
     isLoading = true;
+    loadingSpinner.style.display = "flex"; // Show spinner
 
     try {
-      const response = await fetch(`https://webcotito.onrender.com/productos/buscar_por_categoria_o_tipo?${params}&page=${page}&limit=${productsPerPage}`);
+      // Construct the URL properly
+      const baseUrl = "https://webcotito.onrender.com/productos/buscar_por_categoria_o_tipo";
+      const url = params ? `${baseUrl}?${params}&page=${page}&limit=${productsPerPage}` : `${baseUrl}?page=${page}&limit=${productsPerPage}`;
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Error fetching products: ${response.statusText}`);
       }
@@ -56,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error loading products:", error);
     } finally {
       isLoading = false;
+      loadingSpinner.style.display = "none"; // Hide spinner
     }
   }
 

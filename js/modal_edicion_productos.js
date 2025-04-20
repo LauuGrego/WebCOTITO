@@ -3,11 +3,24 @@ let currentPage = 1;
 const productsPerPage = 10;
 let isLoading = false; // Evitar múltiples solicitudes simultáneas
 
+// Función para mostrar el spinner de carga
+function showLoadingSpinner() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) spinner.style.display = 'block';
+}
+
+// Función para ocultar el spinner de carga
+function hideLoadingSpinner() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) spinner.style.display = 'none';
+}
+
 // Función para obtener productos con paginación
 async function fetchProducts(page = 1, append = false) {
     try {
         if (isLoading) return; // Evitar múltiples solicitudes
         isLoading = true;
+        showLoadingSpinner(); // Mostrar spinner
 
         const response = await fetch(`https://webcotito.onrender.com/productos/listar?page=${page}&limit=${productsPerPage}`, {
             headers: {
@@ -21,9 +34,11 @@ async function fetchProducts(page = 1, append = false) {
         renderProducts(products, append);
         renderPagination(totalPages, page);
         isLoading = false;
+        hideLoadingSpinner(); // Ocultar spinner
     } catch (error) {
         console.error('Error:', error);
         isLoading = false;
+        hideLoadingSpinner(); // Ocultar spinner
     }
 }
 
@@ -317,9 +332,16 @@ window.onclick = function(event) {
     }
 };
 
-// Al cargar el DOM, obtener y renderizar los productos
+// Al cargar el DOM, mostrar el spinner inmediatamente y obtener los productos
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProducts(currentPage);
+    // Crear el spinner de carga
+    const spinner = document.createElement('div');
+    spinner.id = 'loadingSpinner';
+    spinner.style.display = 'block'; // Mostrar spinner inmediatamente
+    spinner.innerHTML = '<div class="spinner"></div>';
+    document.body.appendChild(spinner);
+
+    fetchProducts(currentPage).finally(() => hideLoadingSpinner()); // Ocultar spinner después de cargar los productos
     document.getElementById('editForm').addEventListener('submit', saveProductChanges);
 });
 
