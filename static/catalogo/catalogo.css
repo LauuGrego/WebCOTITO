@@ -2,7 +2,6 @@
 /* 1. Importación de fuentes                    */
 /***********************************************/
 
-/* Self-hosted fonts */
 @font-face {
   font-family: 'Balsamiq Sans';
   src: url('../../fonts/BalsamiqSans-Regular.ttf') format('ttf');
