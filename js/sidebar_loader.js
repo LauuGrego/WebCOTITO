@@ -142,6 +142,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll(".sidebar__link").forEach(link => {
       link.addEventListener("click", async (event) => {
         event.preventDefault();
+        const overlay = document.getElementById("overlay");
+        const sidebar = document.querySelector(".sidebar");
+        overlay.classList.remove("active"); // Hide overlay
+        sidebar.classList.remove("active"); // Close sidebar
+
+        // Load results based on the link's data attributes
         const category = link.dataset.category;
         const type = link.dataset.type;
 
@@ -150,12 +156,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (type) params.append("type", type);
 
         try {
-          catalogCards.innerHTML = "";
-          currentPage = 1;
-          hasMoreProducts = true;
-          loadProductsWithPagination(params.toString(), currentPage);
+            catalogCards.innerHTML = ""; // Clear catalog for new results
+            currentPage = 1;
+            hasMoreProducts = true;
+            await loadProductsWithPagination(params.toString(), currentPage);
         } catch (error) {
-          console.error("Error loading products:", error);
+            console.error("Error loading products:", error);
         }
       });
     });
