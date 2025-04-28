@@ -615,7 +615,7 @@ body {
   font-size: 1.5rem;
   color: var(--color-8);
   margin-bottom: 0.5rem;
-  font-family: 'Balsamiq Sans', cursive;
+  font-family: inherit; /* Use the general font-family */
 }
 
 .card__info {
@@ -646,7 +646,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Balsamiq Sans', cursive;
+  font-family: inherit; /* Use the general font-family */
   margin-right: 0.5rem;
 }
 
@@ -692,7 +692,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Balsamiq Sans', cursive;
+  font-family: inherit; /* Use the general font-family */
 }
 
 .ver-detalles-btn:hover {
@@ -1194,6 +1194,7 @@ body {
     font-size: 1.2rem;
     margin-bottom: 0.25rem;
     text-align: center;
+    font-family: inherit; /* Use the general font-family */
   }
   .card__description {
     font-size: 0.75rem;
@@ -1235,6 +1236,7 @@ body {
     width: 100%;
     white-space: nowrap;
     justify-content: center;
+    font-family: inherit; /* Use the general font-family */
   }
 
   .sidebar__list {
