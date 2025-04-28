@@ -39,22 +39,31 @@ async function loadProducts(searchQuery = '', page = 1) {
     isLoading = true;
 
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchQuery)}&page=${page}&limit=${productsPerPage}`);
-        if (!response.ok) throw new Error('Error al cargar los productos');
+        const url = new URL('https://webcotito.onrender.com/productos/listar');
+        url.searchParams.append('page', page);
+        url.searchParams.append('limit', productsPerPage);
+        if (searchQuery) url.searchParams.append('search', searchQuery);
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            if (response.status === 400) {
+                console.error('Bad Request: Check query parameters.');
+                document.getElementById('catalogCards').innerHTML = '<p>Error: Solicitud incorrecta. Verifique los parámetros de búsqueda.</p>';
+            }
+            throw new Error('Error al cargar los productos');
+        }
+
         const { products, totalPages } = await response.json();
 
         if (page >= totalPages) {
             hasMoreProducts = false;
-            document.querySelector('.load-more-button')?.remove(); // Eliminar botón si no hay más páginas
+            document.querySelector('.load-more-button')?.remove();
         } else if (page === 1) {
-            addLoadMoreButton(); // Mostrar botón "Ver más" solo en la primera carga
+            addLoadMoreButton();
         }
 
         const catalogCards = document.getElementById('catalogCards');
-
-        if (page === 1) {
-            catalogCards.innerHTML = ''; // Limpiar contenido previo solo en la primera página
-        }
+        if (page === 1) catalogCards.innerHTML = '';
 
         if (products.length === 0 && page === 1) {
             catalogCards.innerHTML = '<p>No se encontraron productos.</p>';
