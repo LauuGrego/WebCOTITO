@@ -674,32 +674,6 @@ body.dark-mode .upload-area:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Spinner de carga */
-#loadingSpinner {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-}
-
-.spinner {
-    border: 8px solid rgba(0, 0, 0, 0.1);
-    border-top: 8px solid var(--color-principal);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
 
 /* ========================
    Media Queries
@@ -896,5 +870,23 @@ body.dark-mode .upload-area:hover {
         padding: 0.6rem;
         font-size: 0.9rem;
     }
+}
+
+.load-more-button {
+    background-color: var(--color-principal);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin: 1rem auto;
+    display: block;
+}
+
+.load-more-button:hover {
+    background-color: var(--color-principal-dark);
+    transform: translateY(-2px);
 }
 

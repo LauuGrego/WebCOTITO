@@ -15,7 +15,27 @@ function hideLoadingSpinner() {
     if (spinner) spinner.style.display = 'none';
 }
 
-// Función para obtener productos con paginación
+// Función para agregar el botón "Ver más"
+function addLoadMoreButton() {
+    const paginationContainer = document.querySelector('.pagination');
+    paginationContainer.innerHTML = ""; // Limpiar contenido previo
+    const button = document.createElement('button');
+    button.textContent = "Ver más";
+    button.classList.add('load-more-button');
+    button.addEventListener('click', async () => {
+        if (!isLoading) { // Evitar múltiples solicitudes simultáneas
+            button.disabled = true; // Deshabilitar botón mientras se cargan productos
+            button.textContent = "Cargando...";
+            currentPage++;
+            await fetchProducts(currentPage, true); // Cargar más productos y agregarlos
+            button.disabled = false; // Habilitar nuevamente
+            button.textContent = "Ver más";
+        }
+    });
+    paginationContainer.appendChild(button);
+}
+
+// Modificar fetchProducts para manejar el botón "Ver más"
 async function fetchProducts(page = 1, append = false) {
     try {
         if (isLoading) return; // Evitar múltiples solicitudes
@@ -32,32 +52,19 @@ async function fetchProducts(page = 1, append = false) {
         }
         const { products, totalPages } = await response.json();
         renderProducts(products, append);
-        renderPagination(totalPages, page);
+
+        if (page < totalPages) {
+            addLoadMoreButton(); // Mostrar botón "Ver más" si hay más páginas
+        } else {
+            document.querySelector('.pagination').innerHTML = ""; // Ocultar botón si no hay más páginas
+        }
+
         isLoading = false;
         hideLoadingSpinner(); // Ocultar spinner
     } catch (error) {
         console.error('Error:', error);
         isLoading = false;
         hideLoadingSpinner(); // Ocultar spinner
-    }
-}
-
-// Función para renderizar la paginación
-function renderPagination(totalPages, currentPage) {
-    const paginationContainer = document.querySelector('.pagination');
-    paginationContainer.innerHTML = ""; // Limpiar paginación previa
-
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.textContent = i;
-        button.classList.add('pagination-button');
-        if (i === currentPage) {
-            button.classList.add('active');
-        }
-        button.addEventListener('click', () => {
-            fetchProducts(i);
-        });
-        paginationContainer.appendChild(button);
     }
 }
 
@@ -381,11 +388,3 @@ function debounce(func, wait) {
         timeout = setTimeout(() => func.apply(this, args), wait);
     };
 }
-
-// Agregar evento de scroll infinito
-window.addEventListener('scroll', () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading) {
-        currentPage++;
-        fetchProducts(currentPage, true); // Cargar más productos y agregarlos
-    }
-});

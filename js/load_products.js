@@ -11,7 +11,29 @@ const debounce = (func, delay) => {
   };
 };
 
-// Función para cargar productos con paginación
+// Función para agregar el botón "Ver más"
+function addLoadMoreButton() {
+    const catalogCards = document.getElementById('catalogCards');
+    const existingButton = document.querySelector('.load-more-button');
+    if (existingButton) return; // Evitar duplicar el botón
+
+    const button = document.createElement('button');
+    button.textContent = "Ver más";
+    button.classList.add('load-more-button');
+    button.addEventListener('click', async () => {
+        button.disabled = true; // Deshabilitar mientras se cargan productos
+        button.textContent = "Cargando...";
+        currentPage++;
+        const searchInput = document.querySelector('.header__search-input');
+        const searchQuery = searchInput ? searchInput.value.trim() : '';
+        await loadProducts(searchQuery, currentPage);
+        button.disabled = false; // Habilitar nuevamente
+        button.textContent = "Ver más";
+    });
+    catalogCards.insertAdjacentElement('afterend', button);
+}
+
+// Modificar loadProducts para manejar el botón "Ver más"
 async function loadProducts(searchQuery = '', page = 1) {
     if (isLoading || !hasMoreProducts) return;
     isLoading = true;
@@ -23,6 +45,9 @@ async function loadProducts(searchQuery = '', page = 1) {
 
         if (page >= totalPages) {
             hasMoreProducts = false;
+            document.querySelector('.load-more-button')?.remove(); // Eliminar botón si no hay más páginas
+        } else if (page === 1) {
+            addLoadMoreButton(); // Mostrar botón "Ver más" solo en la primera carga
         }
 
         const catalogCards = document.getElementById('catalogCards');
@@ -73,25 +98,14 @@ async function loadProducts(searchQuery = '', page = 1) {
     }
 }
 
-// Detectar scroll para cargar más productos
-window.addEventListener("scroll", () => {
-    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 100; // Adjusted threshold
-    if (window.scrollY >= scrollThreshold && !isLoading) {
-        currentPage++;
-        const searchInput = document.querySelector('.header__search-input');
-        const searchQuery = searchInput ? searchInput.value.trim() : '';
-        loadProducts(searchQuery, currentPage);
-    }
-});
-
 document.addEventListener('DOMContentLoaded', () => {
-  const searchInput = document.querySelector('.header__search-input');
-  loadProducts();
+    const searchInput = document.querySelector('.header__search-input');
+    loadProducts();
 
-  searchInput.addEventListener('input', debounce(() => {
-    const searchQuery = searchInput.value.trim();
-    currentPage = 1; // Reset current page when a new search is performed
-    hasMoreProducts = true; // Reset hasMoreProducts when a new search is performed
-    loadProducts(searchQuery, currentPage);
-  }, 300)); // 300ms debounce delay
+    searchInput.addEventListener('input', debounce(() => {
+        const searchQuery = searchInput.value.trim();
+        currentPage = 1; // Reset current page when a new search is performed
+        hasMoreProducts = true; // Reset hasMoreProducts when a new search is performed
+        loadProducts(searchQuery, currentPage);
+    }, 300)); // 300ms debounce delay
 });

@@ -164,4 +164,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   loadProductsWithPagination();
+
+  document.querySelectorAll(".mobile-nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+      const overlay = document.getElementById("overlay");
+      const sidebar = document.querySelector(".sidebar");
+      overlay.classList.remove("active"); // Hide overlay
+      sidebar.classList.remove("active"); // Close sidebar
+    });
+  });
 });
