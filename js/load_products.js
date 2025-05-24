@@ -97,6 +97,12 @@ async function loadProducts(searchQuery = '', page = 1) {
         document.querySelectorAll('.ver-detalles-btn').forEach(button => {
             button.addEventListener('click', (event) => {
                 const productId = event.target.dataset.productId;
+                // Guardar estado antes de ir a detalles
+                sessionStorage.setItem('catalogFilters', JSON.stringify({
+                  // Puedes agregar aquí los filtros que uses en este archivo
+                  scrollY: window.scrollY,
+                  productId
+                }));
                 window.location.href = `../detalle/detalle.html?id=${productId}`;
             });
         });

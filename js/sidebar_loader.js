@@ -11,6 +11,91 @@ document.addEventListener("DOMContentLoaded", async () => {
   let isLoading = false;
   let hasMoreProducts = true;
 
+  // Variables globales para filtros activos
+  let activeCategory = null;
+  let activeType = null;
+  let activeSearch = "";
+  let restoringState = false;
+
+  // Guardar estado antes de ir a detalles
+  function saveCatalogState(productId = null) {
+    sessionStorage.setItem('catalogFilters', JSON.stringify({
+      activeCategory,
+      activeType,
+      activeSearch,
+      currentPage,
+      scrollY: window.scrollY,
+      productId
+    }));
+  }
+
+  // Restaurar estado al volver
+  function restoreCatalogState() {
+    const state = sessionStorage.getItem('catalogFilters');
+    if (state) {
+      const { activeCategory: cat, activeType: typ, activeSearch: search, currentPage: _page, scrollY, productId } = JSON.parse(state);
+      activeCategory = cat;
+      activeType = typ;
+      activeSearch = search;
+      // Siempre empezar desde la página 1 y cargar hasta encontrar el producto o restaurar scroll
+      let page = 1;
+      let params = new URLSearchParams();
+      if (activeCategory) params.append("category", activeCategory);
+      if (activeType) params.append("type", activeType);
+      if (activeSearch) params.append("search", activeSearch);
+
+      catalogCards.innerHTML = "";
+      document.querySelector('.load-more-button')?.remove();
+
+      // Función recursiva para cargar páginas hasta encontrar el producto o restaurar scroll
+      function loadUntilProductOrScroll() {
+        loadProductsWithPagination(params.toString(), page).then(() => {
+          const el = productId ? document.querySelector(`[data-product-id="${productId}"]`) : null;
+          if (el) {
+            el.scrollIntoView({ behavior: "auto", block: "center" });
+            sessionStorage.removeItem('catalogFilters');
+          } else if (typeof scrollY === "number" && !productId) {
+            window.scrollTo({ top: scrollY, behavior: "auto" });
+            sessionStorage.removeItem('catalogFilters');
+          } else {
+            // Si hay más productos, cargar la siguiente página
+            if (hasMoreProducts) {
+              page++;
+              loadUntilProductOrScroll();
+            } else {
+              // Si no se encontró, hacer scroll arriba
+              window.scrollTo({ top: 0, behavior: "auto" });
+              sessionStorage.removeItem('catalogFilters');
+            }
+          }
+        });
+      }
+
+      loadUntilProductOrScroll();
+      return true;
+    }
+    return false;
+  }
+
+  // Función para agregar el botón "Ver más"
+  function addLoadMoreButton(params) {
+    let loadMoreBtn = document.querySelector('.load-more-button');
+    if (!loadMoreBtn) {
+      loadMoreBtn = document.createElement('button');
+      loadMoreBtn.className = 'load-more-button';
+      loadMoreBtn.textContent = 'Ver más';
+      loadMoreBtn.addEventListener('click', async () => {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.textContent = 'Cargando...';
+        currentPage++;
+        await loadProductsWithPagination(params, currentPage);
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = 'Ver más';
+      });
+      catalogCards.insertAdjacentElement('afterend', loadMoreBtn);
+    }
+  }
+
   async function loadProductsWithPagination(params = "", page = 1) {
     if (isLoading || !hasMoreProducts) return;
     isLoading = true;
@@ -27,8 +112,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       const { products, totalPages } = await response.json();
 
-      if (page >= totalPages) {
+      // Manejo del botón de paginación
+      if (!products || products.length === 0 || page >= totalPages) {
         hasMoreProducts = false;
+        document.querySelector('.load-more-button')?.remove();
+      } else if (page < totalPages) {
+        hasMoreProducts = true;
+        addLoadMoreButton(params);
       }
 
       products.forEach(product => {
@@ -55,18 +145,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       // Add event listener for "Ver Detalles" buttons
-      document.querySelectorAll('.ver-detalles-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-          const productId = event.target.dataset.productId;
-          window.location.href = `../detalle/detalle.html?id=${productId}`;
-        });
-      });
+      attachVerDetallesListeners();
     } catch (error) {
       console.error("Error loading products:", error);
+      document.querySelector('.load-more-button')?.remove();
     } finally {
       isLoading = false;
       loadingSpinner.style.display = "none"; // Hide spinner
     }
+  }
+
+  // Añadir función para listeners de "Ver Detalles"
+  function attachVerDetallesListeners() {
+    document.querySelectorAll('.ver-detalles-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        const productId = btn.dataset.productId;
+        saveCatalogState(productId);
+        window.location.href = `../detalle/detalle.html?id=${productId}`;
+      };
+    });
   }
 
   let debounceTimeout;
@@ -78,32 +175,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   const searchInput = document.querySelector('.header__search-input');
   searchInput.addEventListener('input', () => {
     debounce(() => {
-      const searchQuery = searchInput.value.trim();
+      activeSearch = searchInput.value.trim();
       currentPage = 1;
       hasMoreProducts = true;
       catalogCards.innerHTML = ""; // Clear catalog for new search
+      document.querySelector('.load-more-button')?.remove(); // Remove previous button if any
+      // Mantener filtros de categoría y tipo activos
       const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
+      if (activeCategory) params.append("category", activeCategory);
+      if (activeType) params.append("type", activeType);
+      if (activeSearch) params.append("search", activeSearch);
       loadProductsWithPagination(params.toString(), currentPage);
     }, 300); // 300ms debounce delay
   });
 
-  window.addEventListener("scroll", () => {
-    const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 100;
-    if (window.scrollY >= scrollThreshold && !isLoading) {
-      currentPage++;
-      const params = new URLSearchParams();
-      const activeCategory = document.querySelector(".sidebar__link[data-category].active");
-      const activeType = document.querySelector(".sidebar__link[data-type].active");
-      const searchQuery = searchInput.value.trim();
-
-      if (activeCategory) params.append("category", activeCategory.dataset.category);
-      if (activeType) params.append("type", activeType.dataset.type);
-      if (searchQuery) params.append("search", searchQuery);
-
-      loadProductsWithPagination(params.toString(), currentPage);
-    }
-  });
+  // Elimina la paginación por scroll: elimina el event listener de scroll
+  // window.addEventListener("scroll", () => {
+  //   // Si usas paginación con botón, puedes eliminar el scroll infinito o dejarlo como fallback
+  //   const scrollThreshold = document.documentElement.scrollHeight - window.innerHeight - 100;
+  //   if (window.scrollY >= scrollThreshold && !isLoading) {
+  //     currentPage++;
+  //     // Usar los filtros activos para la paginación
+  //     const params = new URLSearchParams();
+  //     if (activeCategory) params.append("category", activeCategory);
+  //     if (activeType) params.append("type", activeType);
+  //     if (activeSearch) params.append("search", activeSearch);
+  //     loadProductsWithPagination(params.toString(), currentPage);
+  //   }
+  // });
 
   try {
     const categoriesResponse = await fetch("https://webcotito.onrender.com/categorias/listar-public");
@@ -147,18 +246,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         overlay.classList.remove("active"); // Hide overlay
         sidebar.classList.remove("active"); // Close sidebar
 
-        // Load results based on the link's data attributes
-        const category = link.dataset.category;
-        const type = link.dataset.type;
+        // Guardar filtros activos
+        activeCategory = link.dataset.category || null;
+        activeType = link.dataset.type || null;
+        activeSearch = searchInput.value.trim();
 
         const params = new URLSearchParams();
-        if (category) params.append("category", category);
-        if (type) params.append("type", type);
+        if (activeCategory) params.append("category", activeCategory);
+        if (activeType) params.append("type", activeType);
+        if (activeSearch) params.append("search", activeSearch);
 
         try {
             catalogCards.innerHTML = ""; // Clear catalog for new results
+            window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
             currentPage = 1;
             hasMoreProducts = true;
+            document.querySelector('.load-more-button')?.remove(); // Remove previous button if any
             await loadProductsWithPagination(params.toString(), currentPage);
         } catch (error) {
             console.error("Error loading products:", error);
@@ -169,7 +272,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error loading sidebar data:", error);
   }
 
-  loadProductsWithPagination();
+  // Al cargar la página, restaurar el estado si existe
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!restoreCatalogState()) {
+      loadProductsWithPagination();
+    }
+  });
 
   document.querySelectorAll(".mobile-nav-link").forEach(link => {
     link.addEventListener("click", () => {
