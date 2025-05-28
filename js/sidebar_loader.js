@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       // Construct the URL properly
-      const baseUrl = "webcotito-production.up.railway.app/productos/buscar_por_categoria_o_tipo";
+      const baseUrl = "https://webcotito-production.up.railway.app/productos/buscar_por_categoria_o_tipo";
       const url = params ? `${baseUrl}?${params}&page=${page}&limit=${productsPerPage}` : `${baseUrl}?page=${page}&limit=${productsPerPage}`;
 
       const response = await fetch(url);
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // });
 
   try {
-    const categoriesResponse = await fetch("webcotito-production.up.railway.app/categorias/listar-public");
+    const categoriesResponse = await fetch("https://webcotito-production.up.railway.app/categorias/listar-public");
     if (!categoriesResponse.ok) {
       throw new Error(`Error fetching categories: ${categoriesResponse.statusText}`);
     }
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sidebarCategories.appendChild(li);
     });
 
-    const typesResponse = await fetch("webcotito-production.up.railway.app/productos/listar/tipos");
+    const typesResponse = await fetch("https://webcotito-production.up.railway.app/productos/listar/tipos");
     if (!typesResponse.ok) {
       throw new Error(`Error fetching product types: ${typesResponse.statusText}`);
     }
