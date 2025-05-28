@@ -39,7 +39,7 @@ async function loadProducts(searchQuery = '', page = 1) {
     isLoading = true;
 
     try {
-        const url = new URL('https://webcotito.onrender.com/productos/listar');
+        const url = new URL('webcotito-production.up.railway.app/productos/listar');
         url.searchParams.append('page', page);
         url.searchParams.append('limit', productsPerPage);
         if (searchQuery) url.searchParams.append('search', searchQuery);

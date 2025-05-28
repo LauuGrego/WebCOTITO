@@ -42,7 +42,7 @@ async function fetchProducts(page = 1, append = false) {
         isLoading = true;
         showLoadingSpinner(); // Mostrar spinner
 
-        const response = await fetch(`https://webcotito.onrender.com/productos/listar?page=${page}&limit=${productsPerPage}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/productos/listar?page=${page}&limit=${productsPerPage}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -104,7 +104,7 @@ function renderProducts(products, append = false) {
 async function fetchCategoryName(categoryId) {
     try {
         console.log(`Fetching category name for ID: ${categoryId}`);
-        const response = await fetch(`https://webcotito.onrender.com/categorias/buscar-por-id/${categoryId}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/categorias/buscar-por-id/${categoryId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -128,7 +128,7 @@ async function fetchCategoryName(categoryId) {
 // Función para obtener y listar las categorías en el select del modal
 async function populateCategorySelect(selectedCategoryId = null) {
     try {
-        const response = await fetch('https://webcotito.onrender.com/categorias/listar-public', {
+        const response = await fetch('webcotito-production.up.railway.app/categorias/listar-public', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -160,7 +160,7 @@ async function populateCategorySelect(selectedCategoryId = null) {
 // Abrir modal para editar y rellenar el formulario con los datos del producto seleccionado
 async function openEditModal(productId) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/obtener_por_id/${productId}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/productos/obtener_por_id/${productId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
@@ -274,7 +274,7 @@ async function saveProductChanges(event) {
     }
 
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/actualizar/${productId}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/productos/actualizar/${productId}`, {
             method: 'PUT',
             body: formData,
             headers: {
@@ -298,7 +298,7 @@ async function deleteProduct(productId) {
     if (!confirmation) return; // Cancelar si el usuario no confirma
 
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/eliminar/${productId}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/productos/eliminar/${productId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Función para buscar productos (optimizada)
 async function searchProducts(searchTerm) {
     try {
-        const response = await fetch(`https://webcotito.onrender.com/productos/listar?search=${encodeURIComponent(searchTerm)}&limit=${productsPerPage}`, {
+        const response = await fetch(`webcotito-production.up.railway.app/productos/listar?search=${encodeURIComponent(searchTerm)}&limit=${productsPerPage}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Cargando...';
 
         try {
-            const response = await fetch('https://webcotito.onrender.com/usuarios/login', {
+            const response = await fetch('webcotito-production.up.railway.app/usuarios/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ username, password })
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('access_token', data.access_token); // Guardar token en localStorage
 
             // Verify user details after login
-            const userResponse = await fetch('https://webcotito.onrender.com/usuarios/yo', {
+            const userResponse = await fetch('webcotito-production.up.railway.app/usuarios/yo', {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${data.access_token}` }
             });
