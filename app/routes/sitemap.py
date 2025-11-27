@@ -6,7 +6,7 @@ router = APIRouter()
 
 @router.get("/sitemap.xml", response_class=Response)
 async def get_sitemap():
-    base_url = "https://webcotito.onrender.com"
+    base_url = "https://cotitokids.netlify.app"
     
     # Static URLs
     urls = [
