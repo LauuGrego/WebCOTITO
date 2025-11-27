@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const openBtn = document.getElementById('openLoginModal');
-    const modal   = document.getElementById('loginModal');
-    const closeBtn= document.getElementById('closeModal');
+    const modal = document.getElementById('loginModal');
+    const closeBtn = document.getElementById('closeModal');
     const overlay = document.getElementById('modalOverlay');
     const loginForm = document.querySelector('.login-form'); // Formulario de login
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = formData.get('password');
 
         try {
-            const response = await fetch('https://webcotito-production.up.railway.app/usuarios/login', {
+            const response = await fetch('https://webcotito.onrender.com/usuarios/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const authToken = localStorage.getItem("authToken");
 
     try {
-        const response = await fetch("https://webcotito-production.up.railway.app/categorias/listar-public", {
+        const response = await fetch("https://webcotito.onrender.com/categorias/listar-public", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${authToken}`
@@ -74,7 +74,7 @@ document.getElementById("productForm").addEventListener("submit", async (event) 
             console.log(`${key}: ${value}`);
         }
 
-        const response = await fetch("https://webcotito-production.up.railway.app/productos/agregar", {
+        const response = await fetch("https://webcotito.onrender.com/productos/agregar", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${authToken}`

@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       // Construct the URL properly
-      const baseUrl = "https://webcotito-production.up.railway.app/productos/buscar_por_categoria_o_tipo";
+      const baseUrl = "https://webcotito.onrender.com/productos/buscar_por_categoria_o_tipo";
       const url = params ? `${baseUrl}?${params}&page=${page}&limit=${productsPerPage}` : `${baseUrl}?page=${page}&limit=${productsPerPage}`;
 
       const response = await fetch(url);
@@ -123,8 +123,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       products.forEach(product => {
         const imagePath = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
-        const formattedPrice = product.price 
-          ? product.price.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+        const formattedPrice = product.price
+          ? product.price.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "N/A";
         const card = `
           <div class="card">
@@ -205,20 +205,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   // });
 
   try {
-    const categoriesResponse = await fetch("https://webcotito-production.up.railway.app/categorias/listar-public");
+    const categoriesResponse = await fetch("https://webcotito.onrender.com/categorias/listar-public");
     if (!categoriesResponse.ok) {
       throw new Error(`Error fetching categories: ${categoriesResponse.statusText}`);
     }
     const categories = await categoriesResponse.json();
 
-    sidebarCategories.innerHTML = ""; 
+    sidebarCategories.innerHTML = "";
     categories.forEach(category => {
       const li = document.createElement("li");
       li.innerHTML = `<a href="#" class="sidebar__link" data-category="${category.name}">${category.name}</a>`;
       sidebarCategories.appendChild(li);
     });
 
-    const typesResponse = await fetch("https://webcotito-production.up.railway.app/productos/listar/tipos");
+    const typesResponse = await fetch("https://webcotito.onrender.com/productos/listar/tipos");
     if (!typesResponse.ok) {
       throw new Error(`Error fetching product types: ${typesResponse.statusText}`);
     }
@@ -257,14 +257,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (activeSearch) params.append("search", activeSearch);
 
         try {
-            catalogCards.innerHTML = ""; // Clear catalog for new results
-            window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
-            currentPage = 1;
-            hasMoreProducts = true;
-            document.querySelector('.load-more-button')?.remove(); // Remove previous button if any
-            await loadProductsWithPagination(params.toString(), currentPage);
+          catalogCards.innerHTML = ""; // Clear catalog for new results
+          window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll to top
+          currentPage = 1;
+          hasMoreProducts = true;
+          document.querySelector('.load-more-button')?.remove(); // Remove previous button if any
+          await loadProductsWithPagination(params.toString(), currentPage);
         } catch (error) {
-            console.error("Error loading products:", error);
+          console.error("Error loading products:", error);
         }
       });
     });

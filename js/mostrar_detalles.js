@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const response = await fetch(`https://webcotito-production.up.railway.app/productos/detalle/${productId}`);
+    const response = await fetch(`https://webcotito.onrender.com/productos/detalle/${productId}`);
     if (!response.ok) throw new Error("Error al obtener los detalles del producto.");
     const product = await response.json();
 

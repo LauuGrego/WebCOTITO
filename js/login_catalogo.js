@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const modal       = document.getElementById('loginModal');
-    const overlay     = document.getElementById('modalOverlay');
-    const btnClose    = document.getElementById('closeModal');
-    const btnOpens    = document.querySelectorAll('.open-login-modal');
-    const loginForm   = document.getElementById('loginForm');
+    const modal = document.getElementById('loginModal');
+    const overlay = document.getElementById('modalOverlay');
+    const btnClose = document.getElementById('closeModal');
+    const btnOpens = document.querySelectorAll('.open-login-modal');
+    const loginForm = document.getElementById('loginForm');
 
     btnOpens.forEach(btn => {
         btn.addEventListener('click', e => {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Cargando...';
 
         try {
-            const response = await fetch('https://webcotito-production.up.railway.app/usuarios/login', {
+            const response = await fetch('https://webcotito.onrender.com/usuarios/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ username, password })

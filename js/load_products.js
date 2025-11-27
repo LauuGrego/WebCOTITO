@@ -13,67 +13,67 @@ const debounce = (func, delay) => {
 
 // Función para agregar el botón "Ver más"
 function addLoadMoreButton() {
-    const catalogCards = document.getElementById('catalogCards');
-    const existingButton = document.querySelector('.load-more-button');
-    if (existingButton) return; // Evitar duplicar el botón
+  const catalogCards = document.getElementById('catalogCards');
+  const existingButton = document.querySelector('.load-more-button');
+  if (existingButton) return; // Evitar duplicar el botón
 
-    const button = document.createElement('button');
+  const button = document.createElement('button');
+  button.textContent = "Ver más";
+  button.classList.add('load-more-button');
+  button.addEventListener('click', async () => {
+    button.disabled = true; // Deshabilitar mientras se cargan productos
+    button.textContent = "Cargando...";
+    currentPage++;
+    const searchInput = document.querySelector('.header__search-input');
+    const searchQuery = searchInput ? searchInput.value.trim() : '';
+    await loadProducts(searchQuery, currentPage);
+    button.disabled = false; // Habilitar nuevamente
     button.textContent = "Ver más";
-    button.classList.add('load-more-button');
-    button.addEventListener('click', async () => {
-        button.disabled = true; // Deshabilitar mientras se cargan productos
-        button.textContent = "Cargando...";
-        currentPage++;
-        const searchInput = document.querySelector('.header__search-input');
-        const searchQuery = searchInput ? searchInput.value.trim() : '';
-        await loadProducts(searchQuery, currentPage);
-        button.disabled = false; // Habilitar nuevamente
-        button.textContent = "Ver más";
-    });
-    catalogCards.insertAdjacentElement('afterend', button);
+  });
+  catalogCards.insertAdjacentElement('afterend', button);
 }
 
 // Modificar loadProducts para manejar el botón "Ver más"
 async function loadProducts(searchQuery = '', page = 1) {
-    if (isLoading || !hasMoreProducts) return;
-    isLoading = true;
+  if (isLoading || !hasMoreProducts) return;
+  isLoading = true;
 
-    try {
-        const url = new URL('https://webcotito-production.up.railway.app/productos/listar');
-        url.searchParams.append('page', page);
-        url.searchParams.append('limit', productsPerPage);
-        if (searchQuery) url.searchParams.append('search', searchQuery);
+  try {
+    const url = new URL('https://webcotito.onrender.com/productos/listar');
+    url.searchParams.append('page', page);
+    url.searchParams.append('limit', productsPerPage);
+    if (searchQuery) url.searchParams.append('search', searchQuery);
 
-        const response = await fetch(url);
-        if (!response.ok) {
-            if (response.status === 400) {
-                console.error('Bad Request: Check query parameters.');
-                document.getElementById('catalogCards').innerHTML = '<p>Error: Solicitud incorrecta. Verifique los parámetros de búsqueda.</p>';
-            }
-            throw new Error('Error al cargar los productos');
-        }
+    const response = await fetch(url);
+    if (!response.ok) {
+      if (response.status === 400) {
+        console.error('Bad Request: Check query parameters.');
+        document.getElementById('catalogCards').innerHTML = '<p>Error: Solicitud incorrecta. Verifique los parámetros de búsqueda.</p>';
+      }
+      throw new Error('Error al cargar los productos');
+    }
 
-        const { products, totalPages } = await response.json();
+    const { products, totalPages } = await response.json();
 
-        if (page >= totalPages) {
-            hasMoreProducts = false;
-            document.querySelector('.load-more-button')?.remove();
-        } else if (page === 1) {
-            addLoadMoreButton();
-        }
+    if (page >= totalPages) {
+      hasMoreProducts = false;
+      document.querySelector('.load-more-button')?.remove();
+    } else if (page === 1) {
+      addLoadMoreButton();
+    }
 
-        const catalogCards = document.getElementById('catalogCards');
-        if (page === 1) catalogCards.innerHTML = '';
+    const catalogCards = document.getElementById('catalogCards');
+    if (page === 1) catalogCards.innerHTML = '';
 
-        if (products.length === 0 && page === 1) {
-            catalogCards.innerHTML = '<p>No se encontraron productos.</p>';
-            return;
-        }
+    if (products.length === 0 && page === 1) {
+      catalogCards.innerHTML = '<p>No se encontraron productos.</p>';
+      return;
+    }
 
-        products.forEach(product => {
-            const productImage = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
+    products.forEach(product => {
+      const productImage = product.image_path || 'https://res.cloudinary.com/demo/image/upload/v1/products/default-product.jpg';
 
-            const productCard = `
+      const productCard = `
               <div class="card">
                 <img src="${productImage}" alt="${product.name}" class="card__image" />
                 <div class="card__info">
@@ -90,37 +90,37 @@ async function loadProducts(searchQuery = '', page = 1) {
                   </div>
                 </div>
               </div>`;
-            catalogCards.insertAdjacentHTML('beforeend', productCard);
-        });
+      catalogCards.insertAdjacentHTML('beforeend', productCard);
+    });
 
-        // Add event listener for "Ver Detalles" buttons
-        document.querySelectorAll('.ver-detalles-btn').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const productId = event.target.dataset.productId;
-                // Guardar estado antes de ir a detalles
-                sessionStorage.setItem('catalogFilters', JSON.stringify({
-                  // Puedes agregar aquí los filtros que uses en este archivo
-                  scrollY: window.scrollY,
-                  productId
-                }));
-                window.location.href = `../detalle/detalle.html?id=${productId}`;
-            });
-        });
-    } catch (error) {
-        console.error('Error al cargar los productos:', error);
-    } finally {
-        isLoading = false;
-    }
+    // Add event listener for "Ver Detalles" buttons
+    document.querySelectorAll('.ver-detalles-btn').forEach(button => {
+      button.addEventListener('click', (event) => {
+        const productId = event.target.dataset.productId;
+        // Guardar estado antes de ir a detalles
+        sessionStorage.setItem('catalogFilters', JSON.stringify({
+          // Puedes agregar aquí los filtros que uses en este archivo
+          scrollY: window.scrollY,
+          productId
+        }));
+        window.location.href = `../detalle/detalle.html?id=${productId}`;
+      });
+    });
+  } catch (error) {
+    console.error('Error al cargar los productos:', error);
+  } finally {
+    isLoading = false;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.querySelector('.header__search-input');
-    loadProducts();
+  const searchInput = document.querySelector('.header__search-input');
+  loadProducts();
 
-    searchInput.addEventListener('input', debounce(() => {
-        const searchQuery = searchInput.value.trim();
-        currentPage = 1; // Reset current page when a new search is performed
-        hasMoreProducts = true; // Reset hasMoreProducts when a new search is performed
-        loadProducts(searchQuery, currentPage);
-    }, 300)); // 300ms debounce delay
+  searchInput.addEventListener('input', debounce(() => {
+    const searchQuery = searchInput.value.trim();
+    currentPage = 1; // Reset current page when a new search is performed
+    hasMoreProducts = true; // Reset hasMoreProducts when a new search is performed
+    loadProducts(searchQuery, currentPage);
+  }, 300)); // 300ms debounce delay
 });
