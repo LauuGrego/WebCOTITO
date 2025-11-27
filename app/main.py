@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import products, users, categories, users_JWT_auth, cart
+from app.routes import products, users, categories, users_JWT_auth, cart, sitemap
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -25,6 +25,8 @@ app.include_router(users.router)
 app.include_router(users_JWT_auth.router)
 
 app.include_router(cart.router)
+
+app.include_router(sitemap.router)
 
 @app.head("/monitor")
 async def monitor():
